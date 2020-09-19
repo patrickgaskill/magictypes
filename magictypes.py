@@ -60,6 +60,8 @@ for code, set_model in data.items():
                 card_firsts[key]):
             card_firsts[key] = Card
 
+print(len(card_firsts.keys()), 'cards found.')
+
 with open('card_firsts.csv', 'w', newline='') as csvfile:
     writer = csv.writer(csvfile)
     rows = [(c.type, c.name, c.setCode, c.number)
