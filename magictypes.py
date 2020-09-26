@@ -1,8 +1,8 @@
 import json
+import types
 import re
+import datetime
 import csv
-from types import SimpleNamespace
-from datetime import date
 
 with open('CardTypes.json', 'r') as cardtypes_file:
     cardtypes_data = cardtypes_file.read()
@@ -23,7 +23,7 @@ def does_card_have_every_creature_type(Card):
 
 def sort_key(Card):
     set_model = allprintings[Card.setCode]
-    release_date = date.fromisoformat(set_model['releaseDate'])
+    release_date = datetime.date.fromisoformat(set_model['releaseDate'])
     parsed_number = int(re.sub(r'[^\d]+', '', Card.number))
     return (release_date, parsed_number, Card.number)
 
@@ -31,7 +31,7 @@ def sort_key(Card):
 card_firsts = {}
 
 for code, set_model in allprintings.items():
-    Set = SimpleNamespace(**set_model)
+    Set = types.SimpleNamespace(**set_model)
 
     if Set.type == 'funny' or Set.type == 'memorabilia' or Set.type == 'promo':
         continue
@@ -40,7 +40,7 @@ for code, set_model in allprintings.items():
         continue
 
     for card_model in Set.cards:
-        Card = SimpleNamespace(**card_model)
+        Card = types.SimpleNamespace(**card_model)
 
         if Card.borderColor == 'silver':
             continue
