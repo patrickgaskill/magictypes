@@ -4,16 +4,20 @@ import re
 import datetime
 import csv
 
-with open('CardTypes.json', 'r') as cardtypes_file:
-    cardtypes_data = cardtypes_file.read()
-    cardtypes = json.loads(cardtypes_data)['data']
 
-with open('AllPrintings.json', 'r') as allprintings_file:
-    allprintings_data = allprintings_file.read()
-    allprintings = json.loads(allprintings_data)['data']
+def load_allprintings():
+    with open('AllPrintings.json', 'r') as allprintings_file:
+        allprintings_data = allprintings_file.read()
+    return json.loads(allprintings_data)['data']
 
 
-def does_card_have_every_creature_type(Card):
+def load_cardtypes():
+    with open('CardTypes.json', 'r') as cardtypes_file:
+        cardtypes_data = cardtypes_file.read()
+    return json.loads(cardtypes_data)['data']
+
+
+def has_every_creature_type(Card):
     if Card.name == 'Mistform Ultimus':
         return True
     if hasattr(Card, 'keywords') and 'Changeling' in Card.keywords:
@@ -21,57 +25,65 @@ def does_card_have_every_creature_type(Card):
     return False
 
 
-def sort_key(Card):
-    set_model = allprintings[Card.setCode]
-    release_date = datetime.date.fromisoformat(set_model['releaseDate'])
+def sort_key(Card, Set):
+    release_date = datetime.date.fromisoformat(Set.releaseDate)
     parsed_number = int(re.sub(r'[^\d]+', '', Card.number))
-    return (release_date, parsed_number, Card.number)
+    return release_date, parsed_number, Card.number
 
 
-card_firsts = {}
+def main():
+    allprintings = load_allprintings()
+    cardtypes = load_cardtypes()
 
-for code, set_model in allprintings.items():
-    Set = types.SimpleNamespace(**set_model)
+    card_firsts = {}
 
-    if Set.type == 'funny' or Set.type == 'memorabilia' or Set.type == 'promo':
-        continue
+    for set_model in allprintings.values():
+        Set = types.SimpleNamespace(**set_model)
 
-    if Set.code == 'PAST':
-        continue
-
-    for card_model in Set.cards:
-        Card = types.SimpleNamespace(**card_model)
-
-        if Card.borderColor == 'silver':
+        if Set.type in ('funny', 'memorabilia', 'promo'):
             continue
 
-        # Split cards, adventure cards?
+        if Set.code == 'PAST':
+            continue
 
-        # Handle Mistform Ultimus and changelings
-        is_every_creature_type = does_card_have_every_creature_type(Card)
+        for card_model in Set.cards:
+            Card = types.SimpleNamespace(**card_model)
 
-        # Does it add or change types in play or after activation?
+            if Card.borderColor == 'silver':
+                continue
 
-        # Does it make any tokens?
+            # Split cards, adventure cards?
 
-        if is_every_creature_type:
-            noncreature_subtypes = tuple(
-                st for st in Card.subtypes
-                if st not in cardtypes['creature']['subTypes'])
-            key = (tuple(Card.supertypes), tuple(Card.types),
-                   noncreature_subtypes, is_every_creature_type)
-        else:
-            key = (tuple(Card.supertypes), tuple(Card.types),
-                   tuple(Card.subtypes), is_every_creature_type)
+            # Handle Mistform Ultimus and changelings
+            is_every_creature_type = has_every_creature_type(Card)
 
-        if key not in card_firsts or sort_key(Card) < sort_key(
-                card_firsts[key]):
-            card_firsts[key] = Card
+            # Does it add or change types in play or after activation?
 
-print(len(card_firsts.keys()), 'cards found.')
+            # Does it make any tokens?
 
-with open('card_firsts.csv', 'w', newline='') as csvfile:
-    writer = csv.writer(csvfile)
-    rows = [(c.type, c.name, c.setCode, c.number)
-            for c in sorted(card_firsts.values(), key=sort_key)]
-    writer.writerows(rows)
+            if is_every_creature_type:
+                noncreature_subtypes = tuple(
+                    st for st in Card.subtypes
+                    if st not in cardtypes['creature']['subTypes'])
+                key = (tuple(Card.supertypes), tuple(Card.types),
+                       noncreature_subtypes, is_every_creature_type)
+            else:
+                key = (tuple(Card.supertypes), tuple(Card.types),
+                       tuple(Card.subtypes), is_every_creature_type)
+
+            if key not in card_firsts or sort_key(
+                    Card, Set) < sort_key(*card_firsts[key]):
+                card_firsts[key] = (Card, Set)
+
+    print(len(card_firsts.keys()), 'cards found.')
+
+    with open('card_firsts.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        values = card_firsts.values()
+        values.sort(key=lambda v: sort_key(*v))
+        rows = [(c.type, c.name, c.setCode, c.number) for (c, _) in values]
+        writer.writerows(rows)
+
+
+if __name__ == '__main__':
+    main()
