@@ -9,7 +9,6 @@ pytest = "*"
 black = "*"
 
 [packages]
-mtgsdk = "*"
 
 [requires]
 python_version = "3.9.2"
