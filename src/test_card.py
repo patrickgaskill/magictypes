@@ -1,6 +1,5 @@
 import pytest
 import magictypes
-from operator import attrgetter
 
 
 @pytest.fixture(scope="session")
