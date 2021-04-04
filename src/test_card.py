@@ -1,21 +1,4 @@
 import pytest
-import magictypes
-
-
-@pytest.fixture(scope="session")
-def cards():
-    return magictypes.load_cards()
-
-
-@pytest.fixture
-def get_card(cards):
-    def _get_card(name):
-        return next(
-            (c for c in cards if c.name == name),
-            None,
-        )
-
-    return _get_card
 
 
 @pytest.mark.parametrize(
