@@ -45,24 +45,27 @@ class TokenExtractor:
             ]
         )
         types = "|".join(self.card_types.keys())
-        supertypes = "|".join(self.card_types["artifact"]["superTypes"])
-        subtypes = "|".join(chain(*[v["subTypes"] for v in self.card_types.values()]))
+        subtypes = "|".join(chain(*[v["subTypes"]
+                                    for v in self.card_types.values()]))
 
         pattern = re.compile(
             rf"""create\s
                 (?:(?P<legendary_name>[^,]+),\s)?
                 (?:{numbers})\s
                 (?:tapped\s)?
-                (?P<supertypes>(?:(?:{supertypes})\s)+)?
+                (?:(?P<legendary>legendary)\s)?
                 (?:(?P<power>[\dX*]+)\/(?P<toughness>[\dX*]+)\s)?
                 (?P<colors1>(?:(?:{colors})\s)+)?
+                (?:(?P<snow>snow)\s)?
                 (?P<subtypes>(?:(?:{subtypes})\s)+)?
                 (?P<types>(?:(?:{types})\s)+)?
-                tokens?
-                (?:\ that’s\ (?P<colors2>(?:(?:{colors})[., ]+)+))?""",
+                tokens?\s?
+                (?:with\ [^.]+(?=named))?
+                (?:named\ (?P<name>[^.]+?),?(?:\ (?:where|with|attached|that's) [^.]+)?\.)?""",
             re.IGNORECASE | re.VERBOSE,
         )
-
+        # (?:\ that’s\ (?P<colors2>(?:(?:{colors})[., ]+)+))?
+        print(pattern.pattern)
         self.pattern = pattern
 
     def extract(self, card):
@@ -75,26 +78,36 @@ class TokenExtractor:
 
     def _make_token_from_match(self, match):
         (
-            name,
-            supertypes,
+            legendary_name,
+            legendary,
             power,
             toughness,
             colors1,
+            snow,
             subtypes,
             types,
-            colors2,
+            name,
+            # colors2,
         ) = match
 
         token = SimpleNamespace(
+            supertypes=[],
             types=self._format_matched_types(types),
             subtypes=self._format_matched_types(subtypes),
-            supertypes=self._format_matched_types(supertypes),
         )
+
+        if legendary != "":
+            token.supertypes.append("Legendary")
+
+        if snow != "":
+            token.supertypes.append("Snow")
 
         if "Food" in token.subtypes and "Artifact" not in token.types:
             token.types.append("Artifact")
 
-        if name != "":
+        if legendary_name != "":
+            token.name = legendary_name
+        elif name != "":
             token.name = name
 
         if power != "":
