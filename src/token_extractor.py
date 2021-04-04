@@ -1,11 +1,13 @@
 import json
 import re
+from itertools import chain
 from types import SimpleNamespace
 
 
 class TokenExtractor:
     def __init__(self):
         self._load_enum_values()
+        self._load_card_types()
         self._make_pattern()
 
     def _load_enum_values(self):
@@ -13,6 +15,10 @@ class TokenExtractor:
             self.enum_values = json.load(
                 f, object_hook=lambda d: SimpleNamespace(**d)
             ).data
+
+    def _load_card_types(self):
+        with open("data/CardTypes.json", "r") as f:
+            self.card_types = json.load(f)["data"]
 
     def _make_pattern(self):
         colors = "|".join(
@@ -38,9 +44,9 @@ class TokenExtractor:
                 "thirteen",
             ]
         )
-        types = "|".join(self.enum_values.card.types)
-        supertypes = "|".join(self.enum_values.card.supertypes)
-        subtypes = "|".join(self.enum_values.card.subtypes)
+        types = "|".join(self.card_types.keys())
+        supertypes = "|".join(self.card_types["artifact"]["superTypes"])
+        subtypes = "|".join(chain(*[v["subTypes"] for v in self.card_types.values()]))
 
         pattern = re.compile(
             rf"""create\s
@@ -51,11 +57,12 @@ class TokenExtractor:
                 (?:(?P<power>[\dX*]+)\/(?P<toughness>[\dX*]+)\s)?
                 (?P<colors1>(?:(?:{colors})\s)+)?
                 (?P<subtypes>(?:(?:{subtypes})\s)+)?
-                (?P<types>(?:(?:{types})\s)+)
+                (?P<types>(?:(?:{types})\s)+)?
                 tokens?
                 (?:\ that’s\ (?P<colors2>(?:(?:{colors})[., ]+)+))?""",
             re.IGNORECASE | re.VERBOSE,
         )
+
         self.pattern = pattern
 
     def extract(self, card):
@@ -68,7 +75,7 @@ class TokenExtractor:
 
     def _make_token_from_match(self, match):
         (
-            legendary_name,
+            name,
             supertypes,
             power,
             toughness,
@@ -78,11 +85,25 @@ class TokenExtractor:
             colors2,
         ) = match
 
-        return SimpleNamespace(
+        token = SimpleNamespace(
             types=self._format_matched_types(types),
             subtypes=self._format_matched_types(subtypes),
             supertypes=self._format_matched_types(supertypes),
         )
+
+        if "Food" in token.subtypes and "Artifact" not in token.types:
+            token.types.append("Artifact")
+
+        if name != "":
+            token.name = name
+
+        if power != "":
+            token.power = power
+
+        if toughness != "":
+            token.toughness = toughness
+
+        return token
 
     def _format_matched_types(self, types):
         if types == "":
