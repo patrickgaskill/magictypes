@@ -55,7 +55,7 @@ class TokenExtractor:
                 (?:tapped\s)?
                 (?:(?P<legendary>legendary)\s)?
                 (?:(?P<power>[\dX*]+)\/(?P<toughness>[\dX*]+)\s)?
-                (?P<colors1>(?:(?:{colors})\s)+)?
+                (?P<colors>(?:(?:{colors}),?\s)+)?
                 (?:(?P<snow>snow)\s)?
                 (?P<subtypes>(?:(?:{subtypes})\s)+)?
                 (?P<types>(?:(?:{types})\s)+)?
@@ -65,7 +65,7 @@ class TokenExtractor:
             re.IGNORECASE | re.VERBOSE,
         )
         # (?:\ that’s\ (?P<colors2>(?:(?:{colors})[., ]+)+))?
-        print(pattern.pattern)
+        # print(pattern.pattern)
         self.pattern = pattern
 
     def extract(self, card):
@@ -76,13 +76,29 @@ class TokenExtractor:
         tokens = [self._make_token_from_match(m) for m in matches]
         return tokens
 
+    def _format_matched_colors(self, colors):
+        colors = colors.strip().replace(",", "")
+        if colors == "colorless" or colors == "":
+            return []
+
+        color_map = {
+            "white": "W",
+            "blue": "U",
+            "black": "B",
+            "red": "R",
+            "green": "G"
+        }
+
+        tokens = [color_map[c] for c in colors.split() if c != "and"]
+        return tokens
+
     def _make_token_from_match(self, match):
         (
             legendary_name,
             legendary,
             power,
             toughness,
-            colors1,
+            colors,
             snow,
             subtypes,
             types,
@@ -115,6 +131,8 @@ class TokenExtractor:
 
         if toughness != "":
             token.toughness = toughness
+
+        token.colors = self._format_matched_colors(colors)
 
         return token
 
