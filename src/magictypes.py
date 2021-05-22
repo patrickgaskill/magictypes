@@ -42,7 +42,8 @@ def main():
     with Path("../data/card_firsts.csv").resolve().open("w") as csvfile:
         writer = csv.writer(csvfile)
         rows = [
-            (getattr(c, "type", ""), c.name, getattr(c, "setCode", ""), c.number)
+            (getattr(c, "type", ""), c.name, getattr(c, "setCode", ""),
+             c.number, c.release_date)
             for c in sorted(card_firsts.values(), key=lambda v: v.sort_key)
         ]
         writer.writerows(rows)
