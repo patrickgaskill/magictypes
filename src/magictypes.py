@@ -1,11 +1,12 @@
 import csv
 import json
+from pathlib import Path
 from types import SimpleNamespace
 from card import Card
 
 
 def load_cards():
-    with open("data/SetList.json", "r") as f:
+    with Path("../data/SetList.json").resolve().open() as f:
         sets = json.load(f)
 
     set_map = {}
@@ -20,7 +21,7 @@ def load_cards():
                 return Card(**d)
         return d
 
-    with open("data/AllIdentifiers.json", "r") as f:
+    with Path("../data/AllIdentifiers.json").resolve().open() as f:
         return json.load(f, object_hook=object_hook)["data"].values()
 
 
@@ -36,9 +37,9 @@ def main():
         if k not in card_firsts or card.sort_key < card_firsts[k].sort_key:
             card_firsts[k] = card
 
-    print(len(card_firsts.keys()), "cards found.")
+    print(len(card_firsts.keys()), "cards found")
 
-    with open("data/card_firsts.csv", "w") as csvfile:
+    with Path("../data/card_firsts.csv").resolve().open("w") as csvfile:
         writer = csv.writer(csvfile)
         rows = [
             (getattr(c, "type", ""), c.name, getattr(c, "setCode", ""), c.number)
