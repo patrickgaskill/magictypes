@@ -5,8 +5,12 @@ from types import SimpleNamespace
 from card import Card
 
 
+def data_file(filename):
+    return Path(__file__).parent / "../data" / filename
+
+
 def load_cards():
-    with Path("../data/SetList.json").resolve().open() as f:
+    with data_file("SetList.json").open() as f:
         sets = json.load(f)
 
     set_map = {}
@@ -21,7 +25,7 @@ def load_cards():
                 return Card(**d)
         return d
 
-    with Path("../data/AllIdentifiers.json").resolve().open() as f:
+    with data_file("AllIdentifiers.json").open() as f:
         return json.load(f, object_hook=object_hook)["data"].values()
 
 
@@ -39,7 +43,7 @@ def main():
 
     print(len(card_firsts.keys()), "cards found")
 
-    with Path("../data/card_firsts.csv").resolve().open("w") as csvfile:
+    with data_file("card_firsts.csv").open("w") as csvfile:
         writer = csv.writer(csvfile)
         rows = [
             (getattr(c, "type", ""), c.name, getattr(c, "setCode", ""),
