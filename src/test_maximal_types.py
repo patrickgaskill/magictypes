@@ -1,5 +1,5 @@
 import pytest
-from maximal_combinations import is_type_subset
+from maximal_types import is_type_subset
 
 
 test_cases = [
