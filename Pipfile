@@ -10,6 +10,7 @@ pytest-watch = "*"
 autopep8 = "*"
 
 [packages]
+progress = "*"
 
 [requires]
 python_version = "3.9.2"
