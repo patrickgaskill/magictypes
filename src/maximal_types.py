@@ -147,11 +147,14 @@ def modify_card_in_play(card: Card) -> list[Card]:
             add_subtypes(moritte_copy, all_creature_types)
         returned_cards.append(moritte_copy)
 
-    for card_in_play in returned_cards:
-        # Prismatic Omen (lands are every basic land type)
-        if "Land" in card_in_play.types:
-            add_subtypes(card_in_play, basic_land_types)
+    # Dermotaxi (copy creature from GY and add Vehicle artifact)
+    if "Creature" in card.types:
+        dermotaxi_copy = deepcopy(card)
+        add_types(dermotaxi_copy, ["Artifact"])
+        add_subtypes(dermotaxi_copy, ["Vehicle"])
+        returned_cards.append(dermotaxi_copy)
 
+    for card_in_play in returned_cards:
         # Enchanted Evening (all permanents are enchantments)
         if is_permanent(card_in_play):
             add_types(card_in_play, ["Enchantment"])
@@ -164,9 +167,22 @@ def modify_card_in_play(card: Card) -> list[Card]:
         if "Artifact" in card_in_play.types:
             add_types(card_in_play, ["Creature"])
 
-        # Amoeboid Changeling (creature gets all creature types)
+        # Maskwood Nexus (creature gets all creature types)
         if "Creature" in card_in_play.types:
             add_subtypes(card_in_play, all_creature_types)
+
+        # In Bolas's Clutches (permanent becomes legendary)
+        if is_permanent(card_in_play):
+            add_supertypes(card_in_play, ["Legendary"])
+
+        # Ashaya, Soul of the Wild (nontoken creatures are Forest lands)
+        if "Creature" in card_in_play.types:
+            add_types(card_in_play, ["Land"])
+            add_subtypes(card_in_play, ["Forest"])
+
+        # Prismatic Omen (lands are every basic land type)
+        if "Land" in card_in_play.types:
+            add_subtypes(card_in_play, basic_land_types)
 
         card_in_play.type = format_type(card_in_play)
         card_in_play.__dict__["types_key"] = (
