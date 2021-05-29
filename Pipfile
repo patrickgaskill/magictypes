@@ -11,6 +11,7 @@ autopep8 = "*"
 
 [packages]
 progress = "*"
+lark-parser = "*"
 
 [requires]
 python_version = "3.9.2"

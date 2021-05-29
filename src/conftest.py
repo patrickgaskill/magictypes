@@ -1,6 +1,7 @@
 import pytest
 import magictypes
-from token_extractor import TokenExtractor
+# from token_extractor import TokenExtractor
+from lark_token_extractor import TokenExtractor
 
 
 @pytest.fixture(scope="session")
