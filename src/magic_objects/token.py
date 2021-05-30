@@ -5,7 +5,8 @@ class MagicToken:
     name: str
     colors: list[Union["W", "U", "B", "R", "G"]]
     supertypes: list[str]
-    types: list[str]
+    types: list[Union["Tribal", "Enchantment",
+                      "Artifact", "Land", "Planeswalker", "Creature"]]
     subtypes: list[str]
     text: Optional[str]
     power: Optional[str]
