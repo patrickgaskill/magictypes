@@ -1,7 +1,7 @@
 from typing import Union, Optional
 
 
-class Token:
+class MagicToken:
     name: str
     colors: list[Union["W", "U", "B", "R", "G"]]
     supertypes: list[str]
@@ -19,12 +19,21 @@ class Token:
         "G": 4
     }
 
+    type_order = {
+        "Tribal": 0,
+        "Enchantment": 1,
+        "Artifact": 2,
+        "Land": 3,
+        "Planeswalker": 4,
+        "Creature": 5,
+    }
+
     def __init__(self, name=None, colors=[], supertypes=[], types=[], subtypes=[], text=None, power=None, toughness=None, predefined=None):
         self.name = name or " ".join(subtypes)
         self.colors = sorted(
             colors, key=lambda color: self.color_order[color])
         self.supertypes = supertypes
-        self.types = types
+        self.types = sorted(types, key=lambda t: self.type_order[t])
         self.subtypes = subtypes
         self.text = text
         self.power = power
@@ -89,4 +98,4 @@ class Token:
         return True
 
     def __repr__(self):
-        return "Token(" + ", ".join([f"{k}={v}" for k, v in vars(self).items()]) + ")"
+        return "MagicToken(" + ", ".join([f"{k}={v}" for k, v in vars(self).items()]) + ")"

@@ -1,0 +1,33 @@
+start: _JUNK* (creation _JUNK*)*
+
+_JUNK: WORD | INT | SYMBOL | PUNCTUATION
+
+creation: /creates?/i (create_quantity | create_x | create_a_number_of) "." it_has_rules?
+create_quantity: quantity characteristics
+create_x: "X" characteristics where_x_quantity
+create_a_number_of: "a number of" characteristics equal_to_quantity
+characteristics: power_toughness colors SUBTYPES+ TYPES+ /tokens?/ with_keyword?
+
+where_x_quantity: ", where X is" (WORD | PUNCTUATION)+
+equal_to_quantity: "equal to" WORD+
+it_has_rules: "It has \"" RULES_TEXT "\""
+RULES_TEXT: /[^"]+/
+with_keyword: "with" WORD
+
+quantity: "a" | "two"
+power_toughness: POWER "/" TOUGHNESS
+POWER: INT
+TOUGHNESS: INT
+colors: COLOR ("and" COLOR)?
+COLOR: "white" | "blue" | "black" | "red" | "green" | "colorless"
+SUBTYPES: /[A-Z][a-z]+/
+TYPES: "creature" | "artifact" | "enchantment" | "land" | "planeswalker"
+
+SYMBOL: /\{(?:[WUBRGCXSTQE]|\d+)(?:\/[WUBRGP])?\}/
+PUNCTUATION: /[().—',+:\/]/
+
+%import common.WORD
+%import common.INT
+%import common.NEWLINE
+%import common.WS
+%ignore WS

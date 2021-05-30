@@ -1,7 +1,8 @@
 import lark
 from lark import Lark, v_args
 from lark.visitors import Visitor_Recursive, Visitor, Interpreter, Discard
-from magic_objects.token import Token
+from magic_objects.token import MagicToken
+from magictypes import data_file, load_cards
 from card import Card
 
 
@@ -18,13 +19,13 @@ class TokenExtractor:
     }
 
     def __init__(self):
-        with open("tokens.lark") as f:
+        with open("tokens2.lark") as f:
             self.grammar = f.read()
-        self.parser = Lark(grammar, ambiguity="explicit")
+        self.parser = Lark(self.grammar, ambiguity="explicit")
 
-    def tree_to_tokens(self, tree: lark.Tree) -> list[Token]:
+    def _tree_to_tokens(self, tree: lark.Tree) -> list[MagicToken]:
         tokens = []
-        for creator in tree.find_data("token_creator"):
+        for creator in tree.find_data("creation"):
             characteristics = {"colors": [], "subtypes": [],
                                "types": [], "supertypes": []}
 
@@ -34,76 +35,36 @@ class TokenExtractor:
                 elif t.type == "SUBTYPES":
                     characteristics["subtypes"].append(str(t))
                 elif t.type == "TYPES":
-                    characteristics["types"].append(str(t))
+                    characteristics["types"].append(str(t).capitalize())
                 elif t.type == "POWER":
                     characteristics["power"] = str(t)
                 elif t.type == "TOUGHNESS":
                     characteristics["toughness"] = str(t)
+                elif t.type == "RULES_TEXT":
+                    characteristics["text"] = str(t)
 
-            tokens.append(Token(**characteristics))
+            tokens.append(MagicToken(**characteristics))
         return tokens
 
-    def extract(self, card: Card) -> list[Token]:
+    def extract(self, card: Card) -> list[MagicToken]:
         if not hasattr(card, "text"):
             return []
 
         tree = self.parser.parse(card.text)
-        return self.tree_to_tokens(tree)
+        print(tree)
+        print(tree.pretty())
+        tokens = self._tree_to_tokens(tree)
+        print(tokens)
+        return tokens
 
 
-with open("tokens.lark") as f:
-    grammar = f.read()
-
-parser = Lark(grammar, ambiguity="explicit")
-
-test_text = """Flying
-
-When Abhorrent Overlord enters the battlefield, create a number of 1/1 black Harpy creature tokens with flying equal to your devotion to black. (Each {B} in the mana costs of permanents you control counts toward your devotion to black.)
-
-At the beginning of your upkeep, sacrifice a creature."""
-
-
-def tree_to_tokens(tree: lark.Tree) -> Token:
-    color_map = {
-        "white": "W",
-        "blue": "U",
-        "black": "B",
-        "red": "R",
-        "green": "G"
-    }
-
-    tokens = []
-
-    for creator in tree.find_data("token_creator"):
-        characteristics = {"colors": [], "subtypes": [],
-                           "types": [], "supertypes": []}
-
-        for t in creator.scan_values(lambda v: isinstance(v, lark.Token)):
-            if t.type == "COLOR" and t in color_map:
-                characteristics["colors"].append(color_map[t])
-            elif t.type == "SUBTYPES":
-                characteristics["subtypes"].append(str(t))
-            elif t.type == "TYPES":
-                characteristics["types"].append(str(t))
-            elif t.type == "POWER":
-                characteristics["power"] = str(t)
-            elif t.type == "TOUGHNESS":
-                characteristics["toughness"] = str(t)
-
-        tokens.append(Token(**characteristics))
-
-    return tokens
-
-
-def test():
-    tree = parser.parse(test_text)
-    print(tree)
-    print(tree.pretty())
-    token = tree_to_tokens(tree)
-    print(token)
-    # extractor = TokenExtractor()
-    # tokens = extractor.extract()
-
-
-if __name__ == '__main__':
-    test()
+if __name__ == "__main__":
+    extractor = TokenExtractor()
+    cards = load_cards()
+    aerie = next(
+        (c for c in cards if c.name == "Aerie Worshippers"),
+        None,
+    )
+    print(aerie.text)
+    tokens = extractor.extract(aerie)
+    print(tokens)

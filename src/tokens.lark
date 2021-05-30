@@ -1,23 +1,33 @@
 start: (token_creator | keywords | sentence | reminder | NEWLINE)*
 
-keywords: "Flying"
-sentence: junk "."
-reminder: "(" sentence ")"
-// token_creator: junk /creates?/ quantity power_toughness colors subtypes types /tokens?/ "with flying equal to your devotion to black."
-token_creator: junk number_of_creator
+keywords: keyword ("," keyword)*
+keyword: "flying"i | "devoid"i | "vigilance"i | "first strike"i | "deathtouch"i | "lifelink"i
+sentence: junk+ "."
+reminder: "(" sentence+ ")"
 
-number_of_creator: /creates?/ "a number of" power_toughness colors SUBTYPES TYPES "tokens" "with flying" "equal to" equal_to_quantity "."
-equal_to_quantity: WORD+
+token_creator: junk* (number_of | create_number) "." has_rules_text?
 
-junk: (WORD | "," | "{B}")+
-quantity: "a number of"
+create_number: /creates?/i quantity creation_phrase
+number_of: /creates?/i "a number of" creation_phrase equal_to_quantity
+
+creation_phrase: power_toughness colors SUBTYPES+ TYPES+ /tokens?/ with_keyword?
+
+with_keyword: "with" WORD
+equal_to_quantity: "equal to" WORD+
+has_rules_text: "It has \"" RULES_TEXT "\""
+RULES_TEXT: /[^"]+/
+
+junk: (WORD | INT | SYMBOL | PUNCTUATION)
+SYMBOL: /\{[WUBRGCT1-9]\}/
+PUNCTUATION: /[—',+:\/]/
+quantity: "a" | "two"
 power_toughness: POWER "/" TOUGHNESS
 POWER: INT
 TOUGHNESS: INT
 colors: COLOR ("and" COLOR)?
 COLOR: "white" | "blue" | "black" | "red" | "green" | "colorless"
-SUBTYPES: "Harpy"
-TYPES: "creature"
+SUBTYPES: "Bird" | "Eldrazi" | "Scion" | "Squirrel" | "Harpy" | "Wurm" | "Spirit"
+TYPES: "creature" | "artifact" | "enchantment" | "land" | "planeswalker"
 tokens: "tokens"
 
 %import common.WORD
