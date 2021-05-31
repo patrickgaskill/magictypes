@@ -1,30 +1,47 @@
-start: _JUNK* (creation _JUNK*)*
+start: _JUNK* creation _JUNK*
+     | _JUNK* creation_inside_quotes _JUNK*
+     | _JUNK+
 
-_JUNK: WORD | INT | SYMBOL | PUNCTUATION
+_JUNK: "." | SYMBOL | LOYALTY_COST | PUNCTUATION | INT | WORD
 
-creation: /creates?/i (create_quantity | create_x | create_a_number_of) "." it_has_rules?
-create_quantity: quantity characteristics
+creation_inside_quotes: "\"" _JUNK+ creation "\""
+creation: /creates?/i (TOKEN_NAME ",")? (create_quantity | create_x | create_a_number_of) "." it_has_rules?
+create_quantity: QUANTITY characteristics
 create_x: "X" characteristics where_x_quantity
 create_a_number_of: "a number of" characteristics equal_to_quantity
-characteristics: power_toughness colors SUBTYPES+ TYPES+ /tokens?/ with_keyword?
+characteristics: LEGENDARY? power_toughness? colors? subtypes types /tokens?/ that_are_colors? with_keywords? that_are_attacking? named? attached? for_each? at_the?
 
+QUANTITY: /[a-z]+/
+// QUANTITY: "a" | "an" | "two" | "two" | "three" | "four" | "five" | "six" | "seven" | "eight" | "nine" | "ten" | "eleven" | "twelve" | "thirteen"
+TOKEN_NAME: CAP_WORD (" " CAP_WORD)*
+LEGENDARY: "legendary"
 where_x_quantity: ", where X is" (WORD | PUNCTUATION)+
 equal_to_quantity: "equal to" WORD+
 it_has_rules: "It has \"" RULES_TEXT "\""
 RULES_TEXT: /[^"]+/
-with_keyword: "with" WORD
+that_are_colors: "that are" COLOR "," COLOR ", and" COLOR // Hazezon Tamar
+with_keywords: "with" WORD ("and" WORD)?
+that_are_attacking: "that are" "tapped and"? "attacking"
+named: "named" TOKEN_NAME
+attached: "attached to" WORD+
+for_each: "for each" (WORD | PUNCTUATION)+
+at_the: "at the beginning of your next upkeep"
 
-quantity: "a" | "two"
 power_toughness: POWER "/" TOUGHNESS
 POWER: INT
 TOUGHNESS: INT
-colors: COLOR ("and" COLOR)?
+colors: COLOR | COLOR "and" COLOR
 COLOR: "white" | "blue" | "black" | "red" | "green" | "colorless"
-SUBTYPES: /[A-Z][a-z]+/
-TYPES: "creature" | "artifact" | "enchantment" | "land" | "planeswalker"
+subtypes: SUBTYPE+
+// SUBTYPE: "Human" | "Warrior" | "Avatar" | "Bird" | "Aura" | "Eldrazi" | "Scion" | "Elemental" | "Cat" | "Harpy" | "Squirrel" | "Wurm" | "Sand" | "Spirit" | "Servo" | "Saproling"
+SUBTYPE: CAP_WORD
+types: TYPE+
+TYPE: "creature" | "artifact" | "enchantment" | "land" | "planeswalker"
 
 SYMBOL: /\{(?:[WUBRGCXSTQE]|\d+)(?:\/[WUBRGP])?\}/
-PUNCTUATION: /[().—',+:\/]/
+LOYALTY_COST: /\[(?:\+|−)\d+\]:/
+PUNCTUATION: /[()—',+\-:\/]/
+CAP_WORD: /[A-Z][a-z]+/
 
 %import common.WORD
 %import common.INT
