@@ -12,10 +12,12 @@ def cards():
 @pytest.fixture(scope="session")
 def get_card(cards):
     def _get_card(name):
-        return next(
+        card = next(
             (c for c in cards if c.name == name),
             None,
         )
+        assert card != None
+        return card
 
     return _get_card
 

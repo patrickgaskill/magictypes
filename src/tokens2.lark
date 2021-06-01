@@ -1,5 +1,4 @@
-start: _JUNK* creation _JUNK*
-     | _JUNK* creation_inside_quotes _JUNK*
+start: _JUNK* (creation | creation_inside_quotes) _JUNK*
      | _JUNK+
 
 _JUNK: "." | SYMBOL | LOYALTY_COST | PUNCTUATION | INT | WORD
@@ -9,7 +8,7 @@ creation: /creates?/i (TOKEN_NAME ",")? (create_quantity | create_x | create_a_n
 create_quantity: QUANTITY characteristics
 create_x: "X" characteristics where_x_quantity
 create_a_number_of: "a number of" characteristics equal_to_quantity
-characteristics: LEGENDARY? power_toughness? colors? subtypes types /tokens?/ that_are_colors? with_keywords? that_are_attacking? named? attached? for_each? at_the?
+characteristics: LEGENDARY? power_toughness? colors? subtypes types /tokens?/ that_are_colors? (with_clause_ending | with_clause? that_are_attacking? named? attached? for_each? at_the?)
 
 QUANTITY: /[a-z]+/
 // QUANTITY: "a" | "an" | "two" | "two" | "three" | "four" | "five" | "six" | "seven" | "eight" | "nine" | "ten" | "eleven" | "twelve" | "thirteen"
@@ -20,7 +19,10 @@ equal_to_quantity: "equal to" WORD+
 it_has_rules: "It has \"" RULES_TEXT "\""
 RULES_TEXT: /[^"]+/
 that_are_colors: "that are" COLOR "," COLOR ", and" COLOR // Hazezon Tamar
-with_keywords: "with" WORD ("and" WORD)?
+// with_keywords: "with" WORD ("and" WORD)?
+with_clause_ending: 
+with_clause: "with" WORD ("and" WORD)?
+WITH: WORD | "\"" RULES_TEXT "\""
 that_are_attacking: "that are" "tapped and"? "attacking"
 named: "named" TOKEN_NAME
 attached: "attached to" WORD+

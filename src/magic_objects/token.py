@@ -11,6 +11,7 @@ class MagicToken:
     text: Optional[str]
     power: Optional[str]
     toughness: Optional[str]
+    keywords: Optional[list[str]]
 
     color_order = {
         "W": 0,
@@ -29,7 +30,7 @@ class MagicToken:
         "Creature": 5,
     }
 
-    def __init__(self, name=None, colors=[], supertypes=[], types=[], subtypes=[], text=None, power=None, toughness=None, predefined=None):
+    def __init__(self, name=None, colors=[], supertypes=[], types=[], subtypes=[], text=None, power=None, toughness=None, keywords=None, predefined=None):
         self.name = name or " ".join(subtypes)
         self.colors = sorted(
             colors, key=lambda color: self.color_order[color])
@@ -39,6 +40,7 @@ class MagicToken:
         self.text = text
         self.power = power
         self.toughness = toughness
+        self.keywords = keywords
 
         if predefined == "Treasure":
             self.name = "Treasure"

@@ -19,13 +19,13 @@ class TokenExtractor:
     }
 
     def __init__(self):
-        with open("tokens2.lark") as f:
+        with open("tokens3.lark") as f:
             self.grammar = f.read()
-        self.parser = Lark(self.grammar, debug=True)
+        self.parser = Lark(self.grammar, debug=True, ambiguity="explicit")
 
     def _tree_to_tokens(self, tree: lark.Tree) -> list[MagicToken]:
         tokens = []
-        for creator in tree.find_data("creation"):
+        for creator in tree.find_data("create"):
             characteristics = {"colors": [], "subtypes": [],
                                "types": [], "supertypes": []}
 
@@ -40,6 +40,10 @@ class TokenExtractor:
                     characteristics["power"] = str(t)
                 elif t.type == "TOUGHNESS":
                     characteristics["toughness"] = str(t)
+                elif t.type == "KEYWORD":
+                    if "keywords" not in characteristics:
+                        characteristics["keywords"] = []
+                    characteristics["keywords"].append(str(t))
                 elif t.type == "RULES_TEXT":
                     characteristics["text"] = str(t)
                 elif t.type == "TOKEN_NAME":
