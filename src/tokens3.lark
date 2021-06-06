@@ -1,74 +1,74 @@
-// When Abhorrent Overlord enters the battlefield, create a number of 1/1 black Harpy creature tokens with flying equal to your devotion to black.
-// You create a 1/1 colorless Eldrazi Scion creature token. It has “Sacrifice this creature: Add {C}.”
-// Whenever a nontoken creature you control dies, create a 1/1 white Spirit creature token with flying.
-// Return target creature to its owner’s hand. Create X 1/1 green Saproling creature tokens, where X is that creature’s mana value.
-// −7: You get an emblem with “At the beginning of your end step, create three 1/1 white Cat creature tokens with lifelink.”
-// −8: Create X 2/2 white Cat creature tokens, where X is your life total.
-// −6: Create a white Avatar creature token. It has “This creature’s power and toughness are each equal to your life total.”
-// −2: Create a 2/2 white Cat Soldier creature token named Ajani’s Pridemate with “Whenever you gain life, put a +1/+1 counter on Ajani’s Pridemate.”
-// When Stangg enters the battlefield, create Stangg Twin, a legendary 3/4 red and green Human Warrior creature token.
-// −1: Create a white Aura enchantment token named Mask attached to another target permanent. The token has enchant permanent and totem armor.
-// At the beginning of combat on your turn, for each Aura and Equipment attached to Valduk, Keeper of the Flame, create a 3/1 red Elemental creature token with trample and haste. 
-// At the beginning of your upkeep, create a 2/2 white Cat creature token for each Equipment attached to Kemba, Kha Regent.
-// When Hazezon Tamar enters the battlefield, create X 1/1 Sand Warrior creature tokens that are red, green, and white at the beginning of your next upkeep, where X is the number of lands you control at that time.
-// If you do, create Marit Lage, a legendary 20/20 black Avatar creature token with flying and indestructible.
-// When Drizzt Do'Urden enters the battlefield, create Guenhwyvar, a legendary 4/1 green Cat creature token with trample.
-// Create a 3/6 black and red Avatar creature token with haste and “Whenever this creature attacks, it deals 3 damage to each opponent.”
-// [−2]: Create a 2/2 white Cat Soldier creature token named Ajani's Pridemate with "Whenever you gain life, put a +1/+1 counter on Ajani's Pridemate."
+start: _JUNK* (create_phrase _JUNK*)*
 
-start: _JUNK* create _JUNK*
-     | _JUNK* "\"" _JUNK+ create "\"" _JUNK*
-     | _JUNK+
+create_phrase: create
+             | "\"" _JUNK+ create "\""
+             | /creates?\b/i WORD ("of" | "that")
+             | /creates?\b/i ("a token that's a copy" | "X tokens that are copies") /[^.]+/ "." "\""?
+             | "would create"
+             | /"(?!create)[^"]+[^,]"/i
 
-create: /creates?/i (TOKEN_NAME ",")? definition it_has?
+create: /creates?\b/i (TOKEN_NAME ",")? definition
+create_quoted: "\"" _JUNK+ create? "\""
 
-definition: "X" characteristics at_the? where_x_is "."
-          | "a number of" characteristics with? equal_to "."
-          | quantity characteristics named? with? attached? for_each? "."
+definition: ("X" | "an") characteristics of_the_chosen? with? named? at_the? where_x_is "."
+          | "a number of" (characteristics | PREDEFINED_SUBTYPE /tokens?/) with? equal_to "."
+          | quantity "tapped"? (characteristics | PREDEFINED_SUBTYPE /tokens?/) trailing_clause* ". It has" KEYWORD ", \"" RULES_TEXT "\" and" KEYWORD "."
+          | quantity "tapped"? (characteristics | PREDEFINED_SUBTYPE /tokens?/) trailing_clause* "." it_has?
           | quantity characteristics named? with_quoted
+          | (quantity PREDEFINED_SUBTYPE /tokens?/) ("," "and"? quantity PREDEFINED_SUBTYPE /tokens?/)* "."
 
-// quantity: /[a-z]+/
-quantity: WORD
-characteristics: LEGENDARY? power_toughness? colors SUBTYPE+ TYPE+ /tokens?/
-               | LEGENDARY? power_toughness? SUBTYPE+ TYPE+ /tokens?/ that_are_colors
+trailing_clause: with | at_the | of_the | named | that_are | attached | for_each | "instead" | instead_if | unless_that | that_attacks
+quantity: "that many" | WORD
+characteristics: LEGENDARY? power_toughness? colors* SUBTYPE* SNOW? TYPE+ /tokens?/
+               | LEGENDARY? power_toughness? SUBTYPE+ SNOW? TYPE+ /tokens?/ that_are_colors
 where_x_is: ", where X is" (WORD | PUNCTUATION)+
 equal_to: "equal to" WORD+
 
 // TOKEN_NAME: WORD (" " WORD)* (", " WORD (" " WORD))?
-TOKEN_NAME: /[A-Z][a-z']+/ (" " CAP_WORD)*
+TOKEN_NAME: /[A-Z][a-z']+/ ((" " | " of " | " of the ") CAP_WORD)*
 LEGENDARY: "legendary"
 power_toughness: POWER "/" TOUGHNESS
 POWER: INT | "*" | "X"
 TOUGHNESS: INT | "*" | "X"
-colors: COLOR | COLOR "and" COLOR
+colors: COLOR | COLOR "and" COLOR | COLOR "," COLOR ", and" COLOR
 COLOR: "white" | "blue" | "black" | "red" | "green" | "colorless"
-subtypes: SUBTYPE+
+SNOW: "snow"
 SUBTYPE: CAP_WORD
-types: TYPE+
+PREDEFINED_SUBTYPE: "Food" | "Clue" | "Treasure" | "Shard" | "Gold" | "Walker"
 TYPE: "creature" | "artifact" | "enchantment" | "land" | "planeswalker"
-that_are_colors: "that are" COLOR "," COLOR ", and" COLOR // Hazezon Tamar
+that_are_colors: ("that are" | "that's") COLOR "," COLOR ", and" COLOR // Hazezon Tamar; Godsire
 
-KEYWORD: WORD
+KEYWORD: "protection from black" | "defender" | "flying" | "haste" | "trample" | "reach" | "first strike" | "lifelink" | "deathtouch" | "menace" | ("equip {" INT "}") | "indestructible"
 with: "with" KEYWORD ("and" KEYWORD)?
 with_quoted: "with" (KEYWORD "and")? "\"" RULES_TEXT "\""
-that_are: "that are" "tapped and"? "attacking"
+that_are: ("that's" | "that are") ("tapped and"? "attacking" | "blocking that creature" | "blocking target creature attacking you")
+that_attacks: "that attacks that player each combat if able"
+of_the: "of the chosen color and type"
 named: "named" TOKEN_NAME
 attached: "attached to" WORD+
 for_each: "for each" (WORD | PUNCTUATION)+
-at_the: "at the beginning of your next upkeep"
+at_the: "at the beginning of" ("your" | "the") "next" ("upkeep" | "end step")
+instead_if: "instead if" (WORD | PUNCTUATION)+
+unless_that: "unless that" (WORD | PUNCTUATION | SYMBOL)+
+of_the_chosen: "of the chosen color and type"
 
 
-it_has: "It has" (KEYWORD "and")? "\"" RULES_TEXT "\""
+it_has: ("It has" | "They have" | "They each have" | "Those creatures have") (KEYWORD "and")? "\"" RULES_TEXT "\""
+      | "It has" KEYWORD ", \"" RULES_TEXT "\" and" KEYWORD "."
+
 RULES_TEXT: /[^"]+/
 
-SYMBOL: /\{(?:[WUBRGCXSTQE]|\d+)(?:\/[WUBRGP])?\}/
-LOYALTY_COST: /\[(?:\+|−)?\d+\]:/
-PUNCTUATION: /[()—',+\-:\/]/
+
+SYMBOL: /\{(?:[WUBRGCXSTQE]|\d+|CHAOS)(?:\/[WUBRGP])?\}/
+LOYALTY_COST: /\[(?:\+|−)?[X\d]+\]:/
+PUNCTUATION: /[()—',;!•+\-:\/]/
 CAP_WORD: /[A-Z][a-z]+/
+REMINDER: /\([^)]+\)/
+_JUNK: /(?!creates?\b)/i _POSSIBLE_JUNK
+_POSSIBLE_JUNK: "." | REMINDER | SYMBOL | LOYALTY_COST | PUNCTUATION | INT | WORD
+// _JUNK: "." | SYMBOL | LOYALTY_COST | PUNCTUATION | INT | WORD
 
-_JUNK: "." | SYMBOL | LOYALTY_COST | PUNCTUATION | INT | WORD
-
-%import common.WORD
+WORD: /\w+/
 %import common.INT
 %import common.WS
 %ignore WS

@@ -1,4 +1,6 @@
+import re
 import lark
+from collections import defaultdict
 from lark import Lark, v_args
 from lark.visitors import Visitor_Recursive, Visitor, Interpreter, Discard
 from magic_objects.token import MagicToken
@@ -7,6 +9,7 @@ from card import Card
 
 
 class TokenExtractor:
+    debug: bool
     grammar: str
     parser: Lark
 
@@ -18,16 +21,31 @@ class TokenExtractor:
         "green": "G"
     }
 
-    def __init__(self):
+    overrides = {
+        "Sarpadian Empires, Vol. VII": [
+            MagicToken(types=["Creature"], power="1",
+                       toughness="1", colors=["W"], subtypes=["Citizen"]),
+            MagicToken(types=["Creature"], power="1",
+                       toughness="1", colors=["U"], subtypes=["Camarid"]),
+            MagicToken(types=["Creature"], power="1",
+                       toughness="1", colors=["B"], subtypes=["Thrull"]),
+            MagicToken(types=["Creature"], power="1",
+                       toughness="1", colors=["R"], subtypes=["Goblin"]),
+            MagicToken(types=["Creature"], power="1", toughness="1",
+                       colors=["G"], subtypes=["Saproling"]),
+        ]
+    }
+
+    def __init__(self, debug: bool = False):
+        self.debug = debug
         with open("tokens3.lark") as f:
             self.grammar = f.read()
-        self.parser = Lark(self.grammar, debug=True, ambiguity="explicit")
+        self.parser = Lark(self.grammar, ambiguity="resolve")
 
     def _tree_to_tokens(self, tree: lark.Tree) -> list[MagicToken]:
         tokens = []
-        for creator in tree.find_data("create"):
-            characteristics = {"colors": [], "subtypes": [],
-                               "types": [], "supertypes": []}
+        for creator in tree.find_data("create_phrase"):
+            characteristics = defaultdict(list)
 
             for t in creator.scan_values(lambda v: isinstance(v, lark.Token)):
                 if t.type == "COLOR" and t in self.color_map:
@@ -41,35 +59,54 @@ class TokenExtractor:
                 elif t.type == "TOUGHNESS":
                     characteristics["toughness"] = str(t)
                 elif t.type == "KEYWORD":
-                    if "keywords" not in characteristics:
-                        characteristics["keywords"] = []
                     characteristics["keywords"].append(str(t))
                 elif t.type == "RULES_TEXT":
                     characteristics["text"] = str(t)
                 elif t.type == "TOKEN_NAME":
                     characteristics["name"] = str(t)
-                elif t.type == "LEGENDARY" and t == "legendary":
+                elif t.type == "LEGENDARY":
                     characteristics["supertypes"].append(str("Legendary"))
-            print("characteristics=", characteristics)
-            tokens.append(MagicToken(**characteristics))
+                elif t.type == "SNOW":
+                    characteristics["supertypes"].append(str("Snow"))
+                elif t.type == "PREDEFINED_SUBTYPE":
+                    tokens.append(MagicToken(predefined=str(t)))
+
+            if characteristics:
+                # print("characteristics=", characteristics)
+                tokens.append(MagicToken(**characteristics))
         return tokens
 
     def extract_from_text(self, text: str) -> list[MagicToken]:
         tree = self.parser.parse(text)
-        print(tree)
-        print(tree.pretty())
-        tokens = self._tree_to_tokens(tree)
-        print(tokens)
+        if self.debug:
+            print(tree)
+            print(tree.pretty())
+
+        tokens = []
+        new_tokens = self._tree_to_tokens(tree)
+
+        for new_token in new_tokens:
+            tokens.append(new_token)
+            if new_token.text:
+                subtokens = self.extract_from_text(
+                    re.sub(r" '([^']+)'", r'"\1"', new_token.text))
+                tokens.extend(subtokens)
+
+        if self.debug:
+            print(tokens)
         return tokens
 
     def extract_from_card(self, card: Card) -> list[MagicToken]:
+        if card.name in self.overrides:
+            return self.overrides[card.name]
+
         if not hasattr(card, "text"):
             return []
         return self.extract_from_text(card.text)
 
 
 if __name__ == "__main__":
-    extractor = TokenExtractor()
+    extractor = TokenExtractor(debug=True)
     cards = load_cards()
     card = next(
         (c for c in cards if c.name == "Abhorrent Overlord"),
