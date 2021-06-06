@@ -1,19 +1,22 @@
 from typing import Union, Optional
 
+Color = Union["W", "U", "B", "R", "G"]
+Type = Union["Tribal", "Enchantment",
+             "Artifact", "Land", "Planeswalker", "Creature"]
+
 
 class MagicToken:
     name: str
-    colors: list[Union["W", "U", "B", "R", "G"]]
+    colors: list[Color]
     supertypes: list[str]
-    types: list[Union["Tribal", "Enchantment",
-                      "Artifact", "Land", "Planeswalker", "Creature"]]
+    types: list[Type]
     subtypes: list[str]
     text: Optional[str]
     power: Optional[str]
     toughness: Optional[str]
     keywords: Optional[list[str]]
 
-    color_order = {
+    color_order: dict[Color, int] = {
         "W": 0,
         "U": 1,
         "B": 2,
@@ -21,7 +24,7 @@ class MagicToken:
         "G": 4
     }
 
-    type_order = {
+    type_order: dict[Type, int] = {
         "Tribal": 0,
         "Enchantment": 1,
         "Artifact": 2,
@@ -30,8 +33,22 @@ class MagicToken:
         "Creature": 5,
     }
 
-    def __init__(self, name=None, colors=[], supertypes=[], types=[], subtypes=[], text=None, power=None, toughness=None, keywords=None, predefined=None):
-        self.name = name or " ".join(subtypes)
+    object: str = "token"
+
+    def __init__(
+        self,
+        name: str = None,
+        colors: list[Color] = [],
+        supertypes: list[str] = [],
+        types: list[Type] = [],
+        subtypes: list[str] = [],
+        text: Optional[str] = None,
+        power: Optional[str] = None,
+        toughness: Optional[str] = None,
+        keywords: Optional[list[str]] = None,
+        predefined: Optional[str] = None,
+        creator: Optional[any] = None
+    ):
         self.colors = sorted(
             colors, key=lambda color: self.color_order[color])
         self.supertypes = supertypes
@@ -41,9 +58,9 @@ class MagicToken:
         self.power = power
         self.toughness = toughness
         self.keywords = keywords
+        self.creator = creator
 
         if predefined == "Treasure":
-            self.name = "Treasure"
             self.colors = []
             self.supertypes = []
             self.types = ["Artifact"]
@@ -51,7 +68,6 @@ class MagicToken:
             self.text = "{T}, Sacrifice this artifact: Add one mana of any color."
 
         elif predefined == "Food":
-            self.name = "Food"
             self.colors = []
             self.supertypes = []
             self.types = ["Artifact"]
@@ -59,7 +75,6 @@ class MagicToken:
             self.text = "{2}, {T}, Sacrifice this artifact: You gain 3 life."
 
         elif predefined == "Gold":
-            self.name = "Gold"
             self.colors = []
             self.supertypes = []
             self.types = ["Artifact"]
@@ -76,12 +91,20 @@ class MagicToken:
             self.toughness = "2"
 
         elif predefined == "Shard":
-            self.name = "Shard"
             self.colors = []
             self.supertypes = []
             self.types = ["Enchantment"]
             self.subtypes = ["Shard"]
             self.text = "{2}, Sacrifice this enchantment: Scry 1, then draw a card."
+
+        elif predefined == "Clue":
+            self.colors = []
+            self.supertypes = []
+            self.types = ["Artifact"]
+            self.subtypes = ["Clue"]
+            self.text = "{2}, Sacrifice this artifact: Draw a card."
+
+        self.name = name or " ".join(self.subtypes)
 
     def type(self) -> str:
         type_str = " ".join(self.types)
