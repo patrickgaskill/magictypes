@@ -24,4 +24,4 @@ def get_card(cards):
 
 @pytest.fixture(scope="session")
 def extractor():
-    return TokenExtractor()
+    return TokenExtractor(debug=True)
