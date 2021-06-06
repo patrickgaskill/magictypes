@@ -4,6 +4,8 @@ from types import SimpleNamespace
 
 
 class Card(SimpleNamespace):
+    object = "card"
+
     @property
     def release_date(self):
         if hasattr(self, "originalReleaseDate"):
@@ -54,7 +56,7 @@ class Card(SimpleNamespace):
         if getattr(self, "borderColor", "") in ("gold", "silver"):
             return False
 
-        if hasattr(self, "set") and self.set.type in ("funny", "memorabilia", "promo"):
+        if hasattr(self, "set") and self.set.type in ("funny", "memorabilia"):
             return False
 
         if self.setCode in ("THP1", "THP2", "THP3", "PSAL"):
