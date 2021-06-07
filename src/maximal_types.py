@@ -275,6 +275,39 @@ def main() -> None:
                 update_maximals(card_in_play, maximal_in_play,
                                 eliminated_in_play_keys)
 
+        # First Shard
+        if card.name == "Niko Aris":
+            niko_shard = deepcopy(card)
+            niko_shard.supertypes = []
+            niko_shard.types = ["Enchantment"]
+            niko_shard.subtypes = ["Shard"]
+            niko_shard.object = "token"
+            for card_in_play in modify_card_in_play(niko_shard):
+                update_maximals(card_in_play, maximal_in_play,
+                                eliminated_in_play_keys)
+
+        # First Treasure
+        if card.name == "Depths of Desire":
+            treasure = deepcopy(card)
+            treasure.supertypes = []
+            treasure.types = ["Artifact"]
+            treasure.subtypes = ["Treasure"]
+            treasure.object = "token"
+            for card_in_play in modify_card_in_play(treasure):
+                update_maximals(card_in_play, maximal_in_play,
+                                eliminated_in_play_keys)
+
+        # First Gold
+        if card.name == "Gild":
+            gold = deepcopy(card)
+            gold.supertypes = []
+            gold.types = ["Artifact"]
+            gold.subtypes = ["Gold"]
+            gold.object = "token"
+            for card_in_play in modify_card_in_play(gold):
+                update_maximals(card_in_play, maximal_in_play,
+                                eliminated_in_play_keys)
+
         update_maximals(card, maximal_cards, eliminated_card_keys)
 
         # try:
@@ -322,6 +355,12 @@ def main() -> None:
 
     print("•", len(maximal_in_play.keys()), "cards in play found")
     write_cards_to_csv(maximal_in_play.values(), "maximal_in_play")
+
+    timestr = time.strftime("%Y%m%d-%H%M%S")
+    filename = f"maximal_in_play_decklist-{timestr}.csv"
+    with data_file(filename).open("w") as f:
+        for card in maximal_in_play.values():
+            f.write(f"1 {card.name} ({card.setCode}) {card.number}\n")
 
     # print("•", len(maximal_tokens.keys()), "tokens found")
     # write_cards_to_csv(maximal_tokens.values(), "maximal_tokens")
