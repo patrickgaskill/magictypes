@@ -56,7 +56,7 @@ class Card(SimpleNamespace):
         if getattr(self, "borderColor", "") in ("gold", "silver"):
             return False
 
-        if hasattr(self, "set") and self.set.type in ("funny", "memorabilia"):
+        if hasattr(self, "set") and self.set.type in ("funny", "memorabilia", "promo"):
             return False
 
         if self.setCode in ("THP1", "THP2", "THP3", "PSAL"):
