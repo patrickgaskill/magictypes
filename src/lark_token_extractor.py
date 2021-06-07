@@ -38,9 +38,9 @@ class TokenExtractor:
 
     def __init__(self, debug: bool = False):
         self.debug = debug
-        with open("tokens3.lark") as f:
+        with open("tokens4.lark") as f:
             self.grammar = f.read()
-        self.parser = Lark(self.grammar, ambiguity="resolve")
+        self.parser = Lark(self.grammar, ambiguity="explicit")
 
     def _tree_to_tokens(self, tree: lark.Tree) -> list[MagicToken]:
         tokens = []
@@ -81,6 +81,7 @@ class TokenExtractor:
         if self.debug:
             print(tree)
             print(tree.pretty())
+            assert len(list(tree.find_data("_ambig"))) == 0
 
         tokens = []
         new_tokens = self._tree_to_tokens(tree)

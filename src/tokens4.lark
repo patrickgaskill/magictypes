@@ -1,0 +1,42 @@
+start: [paragraph (_NEWLINE paragraph)*]
+paragraph: keywords
+         | loyalty_ability 
+         | bullet_choice 
+        //  | ability_word 
+        //  | mechanic 
+        //  | cost
+         | sentence+ reminder?
+         | sentence* sentence_ending_choice
+         | reminder
+         
+keywords: (WORD | SYMBOL)+ ("," (WORD | SYMBOL)+)* reminder?
+// keywords: WORD+ ("," WORD+)* reminder?
+sentence: (WORD | INT | SYMBOL | power_toughness | power_toughness_modifier | reminder | quoted | /[:—,!]/)+ ("." | quoted_end)
+sentence_ending_choice: (WORD | INT | SYMBOL | power_toughness | power_toughness_modifier | reminder | quoted | /[:—,!]/)+ "—"
+quoted: /"[^"]+[^.]"/
+quoted_end: /"[^"]+\.'?"/
+choose: "choose"i WORD+ "—"
+// sentence: (WORD~1..2 "—" | WORD | SYMBOL ["," SYMBOL]) (WORD | INT | /[-:,!]/ | SYMBOL | power_toughness | power_toughness_modifier | reminder)+ ("." | "—")
+// parenthetical: "(" WORD+ ")"
+// ability_word: WORD~1..4 "—" sentence+ reminder?
+// mechanic: WORD+ SYMBOL* sentence* reminder?
+// cost: (WORD | SYMBOL)+ ("," (WORD | SYMBOL)+)* ":" sentence* reminder?
+reminder: /\([^)]+\)/
+loyalty_ability: LOYALTY_COST ":" sentence (sentence)* reminder?
+bullet_choice: "•" sentence (sentence)* reminder?
+LOYALTY_COST: /\[[+−]?(?:X|\d+)\]/
+SYMBOL: /{(?:CHAOS|[0-9WUBRGTCSXE])}/
+power_toughness: POWER "/" TOUGHNESS
+POWER: INT | "X"
+TOUGHNESS: INT | "X"
+power_toughness_modifier: ("+" | "-") INT "/" ("+" | "-") INT
+
+// quoted_sentence: "\"" (WORD | INT | /[-:,!]/ | SYMBOL | power_toughness | power_toughness_modifier)+ inner_quoted_ending? "\""
+// quoted_ending: "\"" (WORD | INT | /[-:,!]/ | SYMBOL | power_toughness | power_toughness_modifier)+ ("." (WORD | INT | /[-:,'!]/ | SYMBOL | power_toughness | power_toughness_modifier)+)* ".\""
+// inner_quoted_ending: "'" (WORD | INT | /[-:,!]/ | SYMBOL | power_toughness | power_toughness_modifier)+ ("." (WORD | INT | /[-:,'!]/ | SYMBOL | power_toughness | power_toughness_modifier)+)* ".'"
+
+WORD: /\b(?:[^\d\W]|[-'])+\b/
+%import common.INT
+%import common.NEWLINE -> _NEWLINE
+%import common.WS_INLINE
+%ignore WS_INLINE
