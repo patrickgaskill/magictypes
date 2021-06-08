@@ -47,6 +47,9 @@ class Card(SimpleNamespace):
 
     @property
     def is_valid(self):
+        if self.type == "Card":
+            return False
+
         if "shandalar" in self.availability:
             return False
 
@@ -59,7 +62,29 @@ class Card(SimpleNamespace):
         if hasattr(self, "set") and self.set.type in ("funny", "memorabilia", "promo"):
             return False
 
-        if self.setCode in ("THP1", "THP2", "THP3", "PSAL"):
+        if self.setCode in ("THP1", "THP2", "THP3", "PSAL", "TDAG", "TBTH", "TFTH", "TUND"):
             return False
 
         return True
+
+    @property
+    def is_valid_token(self):
+        if self.type == "Card":
+            return False
+
+        if "shandalar" in self.availability:
+            return False
+
+        if self.layout in ("emblem"):
+            return False
+
+        if getattr(self, "borderColor", "") in ("gold", "silver"):
+            return False
+
+        if hasattr(self, "set") and self.set.type in ("funny", "memorabilia", "promo"):
+            return False
+
+        if self.setCode in ("THP1", "THP2", "THP3", "PSAL", "TDAG", "TBTH", "TFTH", "TUND"):
+            return False
+
+        return self.layout == "token"
