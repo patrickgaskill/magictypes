@@ -1,7 +1,6 @@
 import pytest
 from magic_objects.token import MagicToken
 
-
 test_cases = [
     ("Merfolk of the Pearl Trident", []),
     ("Akrasan Squire", []),
@@ -172,4 +171,4 @@ def test_tokens(get_card, extractor, name, expected):
     card = get_card(name)
     print(getattr(card, "text", "(No card text)"))
     tokens = extractor.extract_from_card(card)
-    # assert tokens == expected
+    assert tokens == expected

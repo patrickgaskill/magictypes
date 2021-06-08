@@ -40,11 +40,11 @@ class TokenExtractor:
         self.debug = debug
         with open("tokens4.lark") as f:
             self.grammar = f.read()
-        self.parser = Lark(self.grammar, ambiguity="explicit")
+        self.parser = Lark(self.grammar, ambiguity="resolve")
 
     def _tree_to_tokens(self, tree: lark.Tree) -> list[MagicToken]:
         tokens = []
-        for creator in tree.find_data("create_phrase"):
+        for creator in tree.find_data("create"):
             characteristics = defaultdict(list)
 
             for t in creator.scan_values(lambda v: isinstance(v, lark.Token)):

@@ -2,25 +2,18 @@ start: [paragraph (_NEWLINE paragraph)*]
 paragraph: keywords
          | loyalty_ability 
          | bullet_choice 
-        //  | ability_word 
-        //  | mechanic 
-        //  | cost
          | sentence+ reminder?
          | sentence* sentence_ending_choice
          | reminder
          
 keywords: (WORD | SYMBOL)+ ("," (WORD | SYMBOL)+)* reminder?
-// keywords: WORD+ ("," WORD+)* reminder?
-sentence: (WORD | INT | SYMBOL | power_toughness | power_toughness_modifier | reminder | quoted | /[:—,!]/)+ ("." | quoted_end)
-sentence_ending_choice: (WORD | INT | SYMBOL | power_toughness | power_toughness_modifier | reminder | quoted | /[:—,!]/)+ "—"
+sentence_text: WORD | INT | SYMBOL | power_toughness | power_toughness_modifier | reminder | quoted | /[:—,!]/
+sentence: sentence_text* create? ("." | quoted_end)
+        | sentence_text+ ("." | quoted_end)
+sentence_ending_choice: sentence_text+ "—"
 quoted: /"[^"]+[^.]"/
 quoted_end: /"[^"]+\.'?"/
 choose: "choose"i WORD+ "—"
-// sentence: (WORD~1..2 "—" | WORD | SYMBOL ["," SYMBOL]) (WORD | INT | /[-:,!]/ | SYMBOL | power_toughness | power_toughness_modifier | reminder)+ ("." | "—")
-// parenthetical: "(" WORD+ ")"
-// ability_word: WORD~1..4 "—" sentence+ reminder?
-// mechanic: WORD+ SYMBOL* sentence* reminder?
-// cost: (WORD | SYMBOL)+ ("," (WORD | SYMBOL)+)* ":" sentence* reminder?
 reminder: /\([^)]+\)/
 loyalty_ability: LOYALTY_COST ":" sentence (sentence)* reminder?
 bullet_choice: "•" sentence (sentence)* reminder?
@@ -31,11 +24,48 @@ POWER: INT | "X"
 TOUGHNESS: INT | "X"
 power_toughness_modifier: ("+" | "-") INT "/" ("+" | "-") INT
 
-// quoted_sentence: "\"" (WORD | INT | /[-:,!]/ | SYMBOL | power_toughness | power_toughness_modifier)+ inner_quoted_ending? "\""
-// quoted_ending: "\"" (WORD | INT | /[-:,!]/ | SYMBOL | power_toughness | power_toughness_modifier)+ ("." (WORD | INT | /[-:,'!]/ | SYMBOL | power_toughness | power_toughness_modifier)+)* ".\""
-// inner_quoted_ending: "'" (WORD | INT | /[-:,!]/ | SYMBOL | power_toughness | power_toughness_modifier)+ ("." (WORD | INT | /[-:,'!]/ | SYMBOL | power_toughness | power_toughness_modifier)+)* ".'"
+create: /creates?\b/i (TOKEN_NAME ",")? quantity "tapped"? LEGENDARY? power_toughness? colors? SNOW? subtypes types /tokens?/ that_are_colors? trailing_clause*
+      | /creates?\b/i quantity PREDEFINED_SUBTYPE /tokens?/
+      | /creates?\b/i quantity /tokens?/ ("that's a copy" | "that are copies") sentence_text+
+      | "creates twice that many" sentence_text+
+      | "create two of those tokens" sentence_text+
+      | "create one of each" sentence_text+
+      | "would create" sentence_text+
 
-WORD: /\b(?:[^\d\W]|[-'])+\b/
+trailing_clause: with | at_the | of_the | named | that_are | attached | for_each | "instead" | instead_if | unless_that | that_attacks | where_x_is
+
+quantity: "that many" | "a number of" | WORD
+TOKEN_NAME: /[A-Z][a-z']+/ ((" " | " of " | " of the ") CAP_WORD)*
+LEGENDARY: "legendary"
+colors: COLOR | COLOR "and" COLOR | COLOR "," COLOR ", and" COLOR
+COLOR: "white" | "blue" | "black" | "red" | "green" | "colorless"
+SNOW: "snow"
+subtypes: SUBTYPE*
+SUBTYPE: CAP_WORD
+types: TYPE+
+TYPE: "creature" | "artifact" | "enchantment" | "land" | "planeswalker"
+PREDEFINED_SUBTYPE: "Food" | "Clue" | "Treasure" | "Shard" | "Gold" | "Walker"
+that_are_colors: ("that are" | "that's") COLOR "," COLOR ", and" COLOR // Hazezon Tamar; Godsire
+
+RULES_TEXT: /[^"]+/
+KEYWORD: "protection from black" | "defender" | "flying" | "haste" | "trample" | "reach" | "first strike" | "lifelink" | "deathtouch" | "menace" | ("equip {" INT "}") | "indestructible"
+with: "with" KEYWORD ("and" KEYWORD)?
+with_quoted: "with" (KEYWORD "and")? "\"" RULES_TEXT "\""
+that_are: ("that's" | "that are") ("tapped and"? "attacking" | "blocking that creature" | "blocking target creature attacking you")
+that_attacks: "that attacks that player each combat if able"
+of_the: "of the chosen color and type"
+where_x_is: ", where X is" sentence_text+
+named: "named" TOKEN_NAME
+attached: "attached to" WORD+
+for_each: "for each" sentence_text+
+at_the: "at the beginning of" ("your" | "the") "next" ("upkeep" | "end step")
+instead_if: "instead if" sentence_text+
+unless_that: "unless that" sentence_text+
+of_the_chosen: "of the chosen color and type"
+
+
+CAP_WORD: /\b[A-Z](?:[^\d\W]|[-'])+\b/
+WORD: /\b(?!creates?\b)(?:[^\d\W]|[-'])+\b/i
 %import common.INT
 %import common.NEWLINE -> _NEWLINE
 %import common.WS_INLINE
