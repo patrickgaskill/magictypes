@@ -8,6 +8,70 @@ from card import Card
 from magic_objects.token import MagicToken
 from lark_token_extractor import TokenExtractor
 
+CardTypesKey = tuple[tuple[str], tuple[str], tuple[str], bool]
+
+
+class MaximalBuilder:
+    name: str
+    store: dict[CardTypesKey, Card]
+    eliminated_keys: dict[CardTypesKey, bool]
+
+    def __init__(self, name):
+        self.name = name
+        self.store = {}
+        self.eliminated_keys = {}
+
+    def evaluate(self, card) -> bool:
+        if card.types_key in self.eliminated_keys:
+            return False
+
+        # if the type already exists replace it only if this card is older
+        if card.types_key in self.store and hasattr(card, "sort_key"):
+            if card.sort_key < self.store[card.types_key].sort_key:
+                self.store[card.types_key] = card
+                return True
+            return False
+
+        # if card is a subset to any saved card go to next card
+        if any(is_type_subset(card, v) for v in self.store.values()):
+            return False
+
+        # if keys are a subset to card, delete those keys
+        keys_to_delete = [
+            k for k, v in self.store.items() if is_type_subset(v, card)]
+        for key in keys_to_delete:
+            self.eliminated_keys[key] = True
+            del self.store[key]
+
+        self.store[card.types_key] = card
+        return True
+
+    @property
+    def filename(self) -> str:
+        timestr = time.strftime("%Y%m%d-%H%M%S")
+        name = self.name.replace(" ", "_")
+        return f"{name}-{timestr}"
+
+    def write_csv(self) -> None:
+        filename = f"{self.filename}.csv"
+        with data_file(filename).open("w") as csvfile:
+            writer = csv.writer(csvfile)
+            rows = [
+                (getattr(c, "type", ""), c.name, getattr(c, "setCode", ""),
+                 getattr(c, "number", ""), getattr(c, "release_date", ""))
+                for c in sorted(self.store.values(), key=lambda v: getattr(v, "sort_key", v.type))
+            ]
+            writer.writerows(rows)
+
+    def write_decklist(self) -> None:
+        filename = f"{self.filename}-decklist.txt"
+        with data_file(filename).open("w") as f:
+            for card in self.store.values():
+                f.write(f"1 {card.name} ({card.setCode}) {card.number}\n")
+
+    def print_report(self) -> None:
+        print(f"✓ {len(self.store.keys())} {self.name} found")
+
 
 def load_creature_types() -> list[str]:
     with data_file("CardTypes.json").open() as f:
@@ -44,46 +108,6 @@ def is_type_subset(a: Card, b: Card) -> bool:
         return True
 
     return False
-
-
-CardTypesKey = tuple[tuple[str], tuple[str], tuple[str], bool]
-
-
-def update_maximals(card: Card, maximal: dict[CardTypesKey, Card], eliminated_keys: list[CardTypesKey]) -> None:
-    if (card.object == "card" and not card.is_valid) or card.types_key in eliminated_keys:
-        return
-
-    # if the type already exists replace it only if this card is older
-    if card.types_key in maximal and hasattr(card, "sort_key"):
-        if card.sort_key < maximal[card.types_key].sort_key:
-            maximal[card.types_key] = card
-        return
-
-    # if card is a subset to any saved card go to next card
-    if any(is_type_subset(card, v) for v in maximal.values()):
-        return
-
-    # if keys are a subset to card, delete those keys
-    keys_to_delete = [
-        k for k, v in maximal.items() if is_type_subset(v, card)]
-    for key in keys_to_delete:
-        eliminated_keys[key] = True
-        del maximal[key]
-
-    maximal[card.types_key] = card
-
-
-def write_cards_to_csv(cards: list[Card], filename: str) -> None:
-    timestr = time.strftime("%Y%m%d-%H%M%S")
-    filename = f"{filename}-{timestr}.csv"
-    with data_file(filename).open("w") as csvfile:
-        writer = csv.writer(csvfile)
-        rows = [
-            (getattr(c, "type", ""), c.name, getattr(c, "setCode", ""),
-             getattr(c, "number", ""), getattr(c, "release_date", ""))
-            for c in sorted(cards, key=lambda v: getattr(v, "sort_key", v.type))
-        ]
-        writer.writerows(rows)
 
 
 supertype_order: dict[str, int] = {
@@ -188,7 +212,7 @@ def modify_card_in_play(card: Card) -> list[Card]:
         returned_cards.append(moritte_copy)
 
     # Dermotaxi (copy creature from GY and add Vehicle artifact)
-    if getattr(card, "object", "") != "token" and "Creature" in card.types:
+    if (getattr(card, "object", "") != "token" and card.layout != "token") and "Creature" in card.types:
         dermotaxi_copy = deepcopy(card)
         add_types(dermotaxi_copy, ["Artifact"])
         add_subtypes(dermotaxi_copy, ["Vehicle"])
@@ -253,120 +277,34 @@ def modify_card_in_play(card: Card) -> list[Card]:
 
 
 def main() -> None:
-    # extractor = TokenExtractor()
-    # token_exceptions = []
     cards = load_cards()
-    maximal_cards = {}
-    eliminated_card_keys = {}
-    maximal_in_play = {}
-    eliminated_in_play_keys = {}
+
+    maximal_cards = MaximalBuilder("maximal cards")
+    maximal_cards_in_play = MaximalBuilder("maximal cards in play")
+    maximal_tokens = MaximalBuilder("maximal tokens")
+    maximal_tokens_in_play = MaximalBuilder("maximal tokens in play")
 
     for card in Bar("Processing cards").iter(cards):
-        if not card.is_valid:
-            continue
+        if card.is_valid:
+            maximal_cards.evaluate(card)
+            for card_in_play in modify_card_in_play(card):
+                maximal_cards_in_play.evaluate(card_in_play)
 
         if card.name == "Grist, the Hunger Tide":
             grist_not_on_battlefield = deepcopy(card)
             add_types(grist_not_on_battlefield, ["Creature"])
             add_subtypes(grist_not_on_battlefield, ["Insect"])
-            # update_maximals(grist_not_on_battlefield,
-            #                 maximal_cards, eliminated_card_keys)
             for card_in_play in modify_card_in_play(grist_not_on_battlefield):
-                update_maximals(card_in_play, maximal_in_play,
-                                eliminated_in_play_keys)
+                maximal_cards_in_play.evaluate(card_in_play)
 
-        # First Shard
-        if card.name == "Niko Aris":
-            niko_shard = deepcopy(card)
-            niko_shard.supertypes = []
-            niko_shard.types = ["Enchantment"]
-            niko_shard.subtypes = ["Shard"]
-            niko_shard.object = "token"
-            for card_in_play in modify_card_in_play(niko_shard):
-                update_maximals(card_in_play, maximal_in_play,
-                                eliminated_in_play_keys)
+        if card.is_valid_token:
+            maximal_tokens.evaluate(card)
+            for card_in_play in modify_card_in_play(card):
+                maximal_tokens_in_play.evaluate(card_in_play)
 
-        # First Treasure
-        if card.name == "Depths of Desire":
-            treasure = deepcopy(card)
-            treasure.supertypes = []
-            treasure.types = ["Artifact"]
-            treasure.subtypes = ["Treasure"]
-            treasure.object = "token"
-            for card_in_play in modify_card_in_play(treasure):
-                update_maximals(card_in_play, maximal_in_play,
-                                eliminated_in_play_keys)
-
-        # First Gold
-        if card.name == "Gild":
-            gold = deepcopy(card)
-            gold.supertypes = []
-            gold.types = ["Artifact"]
-            gold.subtypes = ["Gold"]
-            gold.object = "token"
-            for card_in_play in modify_card_in_play(gold):
-                update_maximals(card_in_play, maximal_in_play,
-                                eliminated_in_play_keys)
-
-        update_maximals(card, maximal_cards, eliminated_card_keys)
-
-        # try:
-        #     tokens = extractor.extract_from_card(card)
-        # except Exception:
-        #     token_exceptions.append(card)
-
-        for card_in_play in modify_card_in_play(card):
-            update_maximals(card_in_play, maximal_in_play,
-                            eliminated_in_play_keys)
-
-    # maximal_tokens = {}
-    # eliminated_token_keys = {}
-    # tokens = [
-    #     # The Hive, LEA
-    #     MagicToken(types=["Artifact", "Creature"], subtypes=[
-    #                "Insect"], name="Wasp", power="1", toughness="1", keywords=["flying"]),
-
-    #     # Bygone Bishop, SOI
-    #     MagicToken(predefined="Clue"),
-
-    #     # Depths of Desire, XLN
-    #     MagicToken(predefined="Treasure"),
-
-    #     # Niko Aris, KHM
-    #     MagicToken(predefined="Shard"),
-
-    #     # Bartered Cow, ELD
-    #     MagicToken(predefined="Food"),
-
-    #     # Gild, BNG
-    #     MagicToken(predefined="Gold"),
-
-    #     # Nahiri the Lithomancer, C14
-    #     MagicToken(name="Stoneforged Blade", types=["Artifact"], subtypes=["Equipment"], keywords=[
-    #                "indestructible", "equip {0}"], text="Equipped creature gets +5/+5 and has double strike")
-    # ]
-    # for token in Bar("Processing tokens").iter(tokens):
-    #     for token_in_play in modify_card_in_play(token):
-    #         update_maximals(token_in_play, maximal_tokens,
-    #                         eliminated_token_keys)
-
-    print("•", len(maximal_cards.keys()), "cards found")
-    write_cards_to_csv(maximal_cards.values(), "maximal_cards")
-
-    print("•", len(maximal_in_play.keys()), "cards in play found")
-    write_cards_to_csv(maximal_in_play.values(), "maximal_in_play")
-
-    timestr = time.strftime("%Y%m%d-%H%M%S")
-    filename = f"maximal_in_play_decklist-{timestr}.csv"
-    with data_file(filename).open("w") as f:
-        for card in maximal_in_play.values():
-            f.write(f"1 {card.name} ({card.setCode}) {card.number}\n")
-
-    # print("•", len(maximal_tokens.keys()), "tokens found")
-    # write_cards_to_csv(maximal_tokens.values(), "maximal_tokens")
-
-    # print("•", len(token_exceptions), "exceptions while parsing tokens")
-    # write_cards_to_csv(token_exceptions, "token_exceptions")
+    for builder in [maximal_cards, maximal_cards_in_play, maximal_tokens, maximal_tokens_in_play]:
+        builder.print_report()
+        builder.write_csv()
 
 
 if __name__ == "__main__":
