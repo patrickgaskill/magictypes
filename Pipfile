@@ -7,11 +7,13 @@ verify_ssl = true
 pylint = "*"
 pytest = "*"
 pytest-watch = "*"
-autopep8 = "*"
+black = "==21.6b0"
 
 [packages]
-progress = "*"
 lark-parser = "*"
+rich = "*"
+ordered-set = "*"
+requests = "*"
 
 [requires]
 python_version = "3.9.2"
