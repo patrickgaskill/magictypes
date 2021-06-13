@@ -1,8 +1,6 @@
-import time
-from pathlib import Path
 from rich.table import Table
 from rich.progress import Progress
-from utils import console, get_data_path
+from utils import console, make_output_dir
 from stores import UniqueStore, MaximalStore
 from mtgjsondata import load_objects
 from effects import after_effects
@@ -34,14 +32,6 @@ def legal_card_filter(card):
         return False
 
     return True
-
-
-def mk_output_dir() -> Path:
-    run_time = time.strftime("%Y-%m-%d-%H%M%S")
-    output_path = get_data_path(f"output/{run_time}")
-    output_path.mkdir(parents=True, exist_ok=True)
-    console.log(f"Created directory {output_path}")
-    return output_path
 
 
 def generate_table(stores):
@@ -101,7 +91,7 @@ def main():
 
             progress.advance(task)
 
-    output_path = mk_output_dir()
+    output_path = make_output_dir()
     for store in stores:
         csv_path = store.write_csv(output_path)
         console.log(f"Created CSV file {csv_path}")
