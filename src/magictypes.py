@@ -95,6 +95,7 @@ def main():
             progress.advance(task)
 
     output_path = make_output_dir()
+    console.log(f"Created directory {output_path}")
     for store in stores:
         csv_path = store.write_csv(output_path)
         console.log(f"Created CSV file {csv_path}")
