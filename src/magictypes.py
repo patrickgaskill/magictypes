@@ -1,6 +1,7 @@
+from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress
-from utils import console, make_output_dir
+from utils import make_output_dir
 from stores import UniqueStore, MaximalStore
 from mtgjsondata import load_objects
 from effects import after_effects
@@ -48,6 +49,7 @@ def generate_table(stores):
 
 
 def main():
+    console = Console()
     unique = UniqueStore("unique cards")
     maximal = MaximalStore("maximal cards")
     maximal_affected = MaximalStore("maximal affected cards")
