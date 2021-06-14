@@ -86,6 +86,14 @@ class MagicObject:
             for t in self.types
         )
 
+    @property
+    def expanded_subtypes(self) -> list[Subtype]:
+        return (
+            self.subtypes.union(self.all_creature_types)
+            if self.is_every_creature_type
+            else self.subtypes
+        )
+
     def sort_types(self) -> None:
         self.supertypes = OrderedSet(
             sorted_with_order(self.supertypes, SUPERTYPE_ORDER)
@@ -120,11 +128,7 @@ class MagicObject:
         return (
             tuple(self.supertypes),
             tuple(self.types),
-            tuple(
-                self.subtypes.union(self.all_creature_types)
-                if self.is_every_creature_type
-                else self.subtypes
-            ),
+            tuple(self.expanded_subtypes),
         )
 
     @property
@@ -137,20 +141,10 @@ class MagicObject:
         parsed_number = int(re.sub(r"[^\d]+", "", self.number))
         return release_date, self.set_code, parsed_number, self.number
 
-    def is_type_subset(self, other: Type[any]) -> bool:
-        self_subtypes = (
-            self.subtypes.union(self.all_creature_types)
-            if self.is_every_creature_type
-            else self.subtypes
-        )
-        other_subtypes = (
-            other.subtypes.union(self.all_creature_types)
-            if other.is_every_creature_type
-            else other.subtypes
-        )
-        return self.types.union(self_subtypes, self.supertypes) < other.types.union(
-            other_subtypes, other.supertypes
-        )
+    def is_type_subset(self, other: "MagicObject") -> bool:
+        return self.types.union(
+            self.expanded_subtypes, self.supertypes
+        ) < other.types.union(other.expanded_subtypes, other.supertypes)
 
     def get_copy(self) -> "MagicObject":
         return deepcopy(self)
