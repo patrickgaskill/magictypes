@@ -20,7 +20,7 @@ class UniqueStore:
 
     def write_csv(self, output_path: Path) -> str:
         csv_path = output_path / (self.name.replace(" ", "_") + ".csv")
-        with (csv_path).open("w") as csvfile:
+        with csv_path.open("w") as csvfile:
             writer = csv.writer(csvfile)
             rows = [
                 (
@@ -34,6 +34,13 @@ class UniqueStore:
             ]
             writer.writerows(rows)
         return csv_path
+
+    def write_decklist(self, output_path: Path) -> str:
+        decklist_path = output_path / (self.name.replace(" ", "_") + "_decklist.txt")
+        with decklist_path.open("w") as decklistfile:
+            for card in self.store.values():
+                decklistfile.write(f"1 {card.name} [{card.set_code}] {card.number}\n")
+        return decklist_path
 
     @property
     def count(self) -> int:

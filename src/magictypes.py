@@ -7,6 +7,9 @@ from effects import after_effects
 
 
 def legal_card_filter(card):
+    if "Card" in card.types:
+        return False
+
     if card.border_color in ("gold", "silver"):
         return False
 
@@ -61,7 +64,7 @@ def main():
     )
 
     with Progress() as progress:
-        task = progress.add_task("Processing cards", start=False)
+        task = progress.add_task("Processing cards...", start=False)
         objects = list(load_objects(legal_card_filter))
         progress.update(task, total=len(objects))
         progress.start_task(task)
@@ -95,6 +98,8 @@ def main():
     for store in stores:
         csv_path = store.write_csv(output_path)
         console.log(f"Created CSV file {csv_path}")
+        decklist_path = store.write_decklist(output_path)
+        console.log(f"Created decklist file {decklist_path}")
 
     console.print(generate_table(stores))
 
