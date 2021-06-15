@@ -8,6 +8,7 @@ pylint = "*"
 pytest = "*"
 pytest-watch = "*"
 black = "==21.6b0"
+snakeviz = "*"
 
 [packages]
 lark-parser = "*"
