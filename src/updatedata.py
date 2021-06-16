@@ -1,7 +1,10 @@
 from io import BytesIO
 from zipfile import ZipFile
 import requests
-from utils import console, get_data_path
+from rich.console import Console
+from utils import get_data_path
+
+console = Console()
 
 MTGJSON_BASE_URL = "https://mtgjson.com/api/v5"
 

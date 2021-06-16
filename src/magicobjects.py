@@ -1,7 +1,7 @@
 from copy import deepcopy
 from datetime import datetime
 import re
-from typing import Type, Literal, Union, Optional, Iterable, TypeVar, NewType, ClassVar
+from typing import Literal, Union, Optional, Iterable, TypeVar, NewType, ClassVar
 from dataclasses import dataclass
 from ordered_set import OrderedSet
 
