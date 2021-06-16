@@ -15,6 +15,7 @@ lark-parser = "*"
 rich = "*"
 ordered-set = "*"
 requests = "*"
+marshmallow = "*"
 
 [requires]
 python_version = "3.9.2"
