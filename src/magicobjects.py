@@ -2,6 +2,7 @@ import re
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime
+from functools import cached_property
 from typing import ClassVar, Literal, NewType, Optional
 
 ObjectType = Literal["object", "card", "token"]
@@ -60,7 +61,7 @@ class MagicObject:
 
         return self.set_release_date
 
-    @property
+    @cached_property
     def is_every_creature_type(self) -> bool:
         return (
             "Changeling" in self.keywords
@@ -72,14 +73,14 @@ class MagicObject:
     def is_token(self) -> bool:
         return self.layout == "token"
 
-    @property
+    @cached_property
     def is_permanent(self) -> bool:
         return any(
             t in ("Artifact", "Creature", "Enchantment", "Land", "Planeswalker")
             for t in self.types
         )
 
-    @property
+    @cached_property
     def expanded_subtypes(self) -> set[Subtype]:
         if self.subtypes >= self.all_creature_types:
             return self.subtypes
@@ -90,7 +91,7 @@ class MagicObject:
             else self.subtypes
         )
 
-    @property
+    @cached_property
     def type_str(self) -> str:
         formatted = " ".join(
             sorted(self.supertypes, key=lambda x: SUPERTYPE_ORDER[x])
@@ -123,7 +124,7 @@ class MagicObject:
 
         return formatted
 
-    @property
+    @cached_property
     def type_key(self) -> TypeKey:
         return (
             tuple(sorted(self.supertypes)),
@@ -131,7 +132,7 @@ class MagicObject:
             tuple(sorted(self.expanded_subtypes)),
         )
 
-    @property
+    @cached_property
     def sort_key(self) -> tuple[datetime, str, int, str]:
         release_date = (
             datetime.fromisoformat(self.release_date)
@@ -148,3 +149,19 @@ class MagicObject:
 
     def get_copy(self) -> "MagicObject":
         return deepcopy(self)
+
+    def clear_cached_properties(self) -> None:
+        for attr in (
+            "is_every_creature_type",
+            "expanded_subtypes",
+            "is_permanent",
+            "type_str",
+            "type_key",
+        ):
+            if hasattr(self, attr):
+                delattr(self, attr)
+        # del self.is_every_creature_type
+        # del self.expanded_subtypes
+        # del self.is_permanent
+        # # del self.type_str
+        # del self.type_key

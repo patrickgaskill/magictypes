@@ -55,4 +55,6 @@ def after_effects(card: MagicObject) -> list[MagicObject]:
         if affected_card.is_permanent:
             affected_card.supertypes.add("Snow")
 
+        affected_card.clear_cached_properties()
+
     return returned_cards

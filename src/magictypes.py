@@ -63,6 +63,7 @@ def main():
                     grist_copy = card.get_copy()
                     grist_copy.types.add("Creature")
                     grist_copy.subtypes.add("Insect")
+                    grist_copy.clear_cached_properties()
                     unique.evaluate(grist_copy)
                     maximal.evaluate(grist_copy)
                     for affected_grist in after_effects(grist_copy):
