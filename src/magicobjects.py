@@ -165,12 +165,6 @@ class MagicObject:
         )
 
     def clear_cached_properties(self) -> None:
-        for attr in (
-            "is_every_creature_type",
-            "expanded_subtypes",
-            "is_permanent",
-            "type_str",
-            "type_key",
-        ):
-            if hasattr(self, attr):
-                delattr(self, attr)
+        for value in vars(self).values():
+            if hasattr(value, "cache_clear"):
+                value.cache_clear()
