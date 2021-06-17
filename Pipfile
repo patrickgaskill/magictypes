@@ -17,6 +17,7 @@ ordered-set = "*"
 requests = "*"
 marshmallow-dataclass = "*"
 marshmallow-polyfield = "*"
+orjson = "*"
 
 [requires]
 python_version = "3.9.2"
