@@ -381,7 +381,9 @@ class MtgjsonData:
         for card in self.all_identifiers.values():
             magic_obj = MagicObject(
                 name=card.name,
-                types=set(card.types),
+                types=set(
+                    t for t in card.types if t != "Token"
+                ),  # mtgjson adds a fake Token type to token objects
                 subtypes=set(card.subtypes),
                 supertypes=set(card.supertypes),
                 keywords=set(card.keywords) if card.keywords is not None else set(),
