@@ -1,5 +1,4 @@
 import re
-from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime
 from typing import ClassVar, Literal, NewType, Optional
@@ -147,4 +146,19 @@ class MagicObject:
         ) < other.types.union(other.expanded_subtypes, other.supertypes)
 
     def get_copy(self) -> "MagicObject":
-        return deepcopy(self)
+        return MagicObject(
+            name=self.name,
+            types=self.types.copy(),
+            subtypes=self.subtypes.copy(),
+            supertypes=self.supertypes.copy(),
+            keywords=self.keywords.copy(),
+            set_code=self.set_code,
+            set_release_date=self.set_release_date,
+            set_type=self.set_type,
+            original_release_date=self.original_release_date,
+            number=self.number,
+            border_color=self.border_color,
+            availability=self.availability.copy(),
+            layout=self.layout,
+            subtype_order=self.subtype_order.copy(),
+        )
