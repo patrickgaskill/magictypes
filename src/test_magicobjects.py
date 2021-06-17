@@ -40,3 +40,29 @@ def test_is_type_subset(mtgjsondata, name_a, name_b, expected_ab, expected_ba):
     print(f"B) {name_b} subtypes:", card_b.subtypes)
     assert card_a.is_type_subset(card_b) == expected_ab
     assert card_b.is_type_subset(card_a) == expected_ba
+
+
+@pytest.mark.parametrize(
+    "name,expected",
+    [
+        (
+            "Balefire Liege",
+            (
+                (),
+                ("Creature",),
+                ("Horror", "Spirit"),
+            ),
+        ),
+        (
+            "Krovikan Horror",
+            (
+                (),
+                ("Creature",),
+                ("Horror", "Spirit"),
+            ),
+        ),
+    ],
+)
+def test_type_key(mtgjsondata, name, expected):
+    card = mtgjsondata.get_card_by_name(name)
+    assert card.type_key == expected
