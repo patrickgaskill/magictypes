@@ -202,7 +202,7 @@ class MtgjsonCardAtomicFile:
     meta: MtgjsonMeta
 
 
-def card_set_serialization_disambiguation(base_object, parent_obj):
+def card_set_serialization_disambiguation(base_object, _):
     class_to_schema = {
         MtgjsonCardSet.__name__: MtgjsonCardSet.Schema(),
         MtgjsonCardToken.__name__: MtgjsonCardToken.Schema(),
