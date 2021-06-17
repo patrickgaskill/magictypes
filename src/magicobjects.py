@@ -80,7 +80,10 @@ class MagicObject:
         )
 
     @property
-    def expanded_subtypes(self) -> list[Subtype]:
+    def expanded_subtypes(self) -> set[Subtype]:
+        if self.subtypes >= self.all_creature_types:
+            return self.subtypes
+
         return (
             self.subtypes.union(self.all_creature_types)
             if self.is_every_creature_type
