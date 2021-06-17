@@ -1,10 +1,11 @@
 from rich.console import Console
-from rich.table import Table
 from rich.progress import Progress
-from utils import make_output_dir
-from stores import UniqueStore, MaximalStore
-from mtgjsondata import load_objects
+from rich.table import Table
+
 from effects import after_effects
+from mtgjsondata import MtgjsonData
+from stores import MaximalStore, UniqueStore
+from utils import make_output_dir
 
 
 def legal_card_filter(card):
@@ -67,7 +68,8 @@ def main():
 
     with Progress() as progress:
         task = progress.add_task("Processing cards...", start=False)
-        objects = list(load_objects(legal_card_filter))
+        mtgjsondata = MtgjsonData()
+        objects = list(mtgjsondata.load_objects(legal_card_filter))
         progress.update(task, total=len(objects))
         progress.start_task(task)
 

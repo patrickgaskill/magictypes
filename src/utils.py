@@ -11,3 +11,9 @@ def make_output_dir() -> Path:
     output_path = get_data_path(f"output/{run_time}")
     output_path.mkdir(parents=True, exist_ok=True)
     return output_path
+
+
+# https://marshmallow.readthedocs.io/en/latest/examples.html#inflection-camel-casing-keys
+def camelcase(s):
+    parts = iter(s.split("_"))
+    return next(parts) + "".join(i.title() for i in parts)

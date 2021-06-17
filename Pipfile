@@ -15,7 +15,8 @@ lark-parser = "*"
 rich = "*"
 ordered-set = "*"
 requests = "*"
-marshmallow = "*"
+marshmallow-dataclass = "*"
+marshmallow-polyfield = "*"
 
 [requires]
 python_version = "3.9.2"

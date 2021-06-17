@@ -1,6 +1,7 @@
 import csv
 from pathlib import Path
-from magicobjects import TypeKey, MagicObject
+
+from magicobjects import MagicObject, TypeKey
 
 
 class UniqueStore:

@@ -1,17 +1,14 @@
-from copy import deepcopy
-from datetime import datetime
 import re
-from typing import Literal, Union, Optional, Iterable, TypeVar, NewType, ClassVar
+from copy import deepcopy
 from dataclasses import dataclass
-from ordered_set import OrderedSet
+from datetime import datetime
+from typing import ClassVar, Literal, NewType, Optional, TypeVar
 
 ObjectType = Literal["object", "card", "token"]
-Color = Union["W", "U", "B", "R", "G"]
-CardType = Union[
-    "Tribal", "Enchantment", "Artifact", "Land", "Planeswalker", "Creature"
-]
+Color = Literal["W", "U", "B", "R", "G"]
+CardType = NewType("Type", str)
 Subtype = NewType("Subtype", str)
-Supertype = Union["Basic", "Legendary", "Ongoing", "Snow", "World"]
+Supertype = NewType("Supertype", str)
 Keyword = NewType("Keyword", str)
 TypeKey = tuple[tuple[Supertype, ...], tuple[CardType, ...], tuple[Subtype, ...]]
 T = TypeVar("T")
@@ -36,10 +33,6 @@ SUPERTYPE_ORDER: dict[Supertype, int] = {
 }
 
 
-def sorted_with_order(iterable: Iterable[T], order_dict: dict[T, int]) -> Iterable[T]:
-    return sorted(iterable, key=lambda x: order_dict[x] if x in order_dict else 0)
-
-
 @dataclass
 class MagicObject:
     all_creature_types: ClassVar[set[Subtype]]
@@ -47,9 +40,9 @@ class MagicObject:
         ["Forest", "Island", "Mountain", "Plains", "Swamp"]
     )
     name: str
-    types: OrderedSet[CardType]
-    subtypes: OrderedSet[Subtype]
-    supertypes: OrderedSet[Supertype]
+    types: set[CardType]
+    subtypes: set[Subtype]
+    supertypes: set[Supertype]
     keywords: set[Keyword]
     set_code: str
     set_release_date: Optional[str]
@@ -59,6 +52,7 @@ class MagicObject:
     border_color: str
     availability: set[str]
     layout: str
+    subtype_order: dict[Subtype, int]
 
     @property
     def release_date(self) -> str:
@@ -94,16 +88,14 @@ class MagicObject:
             else self.subtypes
         )
 
-    def sort_types(self) -> None:
-        self.supertypes = OrderedSet(
-            sorted_with_order(self.supertypes, SUPERTYPE_ORDER)
-        )
-        self.types = OrderedSet(sorted_with_order(self.types, TYPE_ORDER))
-        self.subtypes = OrderedSet(sorted(self.subtypes))
-
     @property
     def type_str(self) -> str:
-        formatted = " ".join(list(self.supertypes) + list(self.types))
+        formatted = " ".join(
+            sorted(self.supertypes, key=lambda x: SUPERTYPE_ORDER[x])
+            + sorted(
+                self.types, key=lambda x: TYPE_ORDER[x] if x in TYPE_ORDER else 999
+            )
+        )
 
         subtypes = self.subtypes
         notes = []
@@ -116,7 +108,13 @@ class MagicObject:
             subtypes -= self.all_creature_types
             notes.append("(all creature types)")
 
-        notes_and_subtypes = list(subtypes) + notes
+        notes_and_subtypes = (
+            sorted(
+                subtypes,
+                key=lambda x: self.subtype_order[x] if x in self.subtype_order else 999,
+            )
+            + notes
+        )
 
         if len(notes_and_subtypes) > 0:
             formatted = f"{formatted} — {' '.join(notes_and_subtypes)}"
@@ -126,9 +124,9 @@ class MagicObject:
     @property
     def type_key(self) -> TypeKey:
         return (
-            tuple(self.supertypes),
-            tuple(self.types),
-            tuple(self.expanded_subtypes),
+            tuple(sorted(self.supertypes)),
+            tuple(sorted(self.types)),
+            tuple(sorted(self.expanded_subtypes)),
         )
 
     @property

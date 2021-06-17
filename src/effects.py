@@ -9,7 +9,8 @@ def after_effects(card: MagicObject) -> list[MagicObject]:
         moritte_copy = card.get_copy()
         moritte_copy.supertypes |= {"Legendary", "Snow"}
         if "Creature" in moritte_copy.types:
-            moritte_copy.subtypes |= card.all_creature_types
+            # moritte_copy.subtypes |= card.all_creature_types
+            moritte_copy.keywords.add("Changeling")
         returned_cards.append(moritte_copy)
 
     # Dermotaxi (copy creature from GY and add Vehicle artifact)
@@ -53,7 +54,5 @@ def after_effects(card: MagicObject) -> list[MagicObject]:
         # Rimefeather Owl (permanents with ice counters are snow)
         if affected_card.is_permanent:
             affected_card.supertypes.add("Snow")
-
-        affected_card.sort_types()
 
     return returned_cards

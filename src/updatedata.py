@@ -15,8 +15,6 @@ MTGJSON_FILES = [
     "AllIdentifiers",
     "EnumValues",
     "SetList",
-    "Vintage",
-    "VintageAtomic",
     "CardTypes",
 ]
 
