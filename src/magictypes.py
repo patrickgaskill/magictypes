@@ -37,9 +37,11 @@ def main():
     )
 
     with Progress() as progress:
+        progress.console.log("Starting to load objects")
         task = progress.add_task("Processing cards...", start=False)
         mtgjsondata = MtgjsonData()
         objects = list(mtgjsondata.load_objects())
+        progress.console.log("Loading objects complete")
         progress.update(task, total=len(objects))
         progress.start_task(task)
 
