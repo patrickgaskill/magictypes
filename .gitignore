@@ -142,3 +142,4 @@ cython_debug/
 Pipfile.lock
 data
 old
+*.prof
