@@ -1,3 +1,4 @@
+from rich import box
 from rich.console import Console
 from rich.progress import Progress
 from rich.table import Table
@@ -8,39 +9,8 @@ from stores import MaximalStore, UniqueStore
 from utils import make_output_dir
 
 
-def legal_card_filter(card):
-    if "Card" in card.types:
-        return False
-
-    if card.border_color in ("gold", "silver"):
-        return False
-
-    if "shandalar" in card.availability:
-        return False
-
-    if card.layout == "emblem":
-        return False
-
-    if card.set_type in ("funny", "memorabilia", "promo"):
-        return False
-
-    if card.set_code in (
-        "THP1",
-        "THP2",
-        "THP3",
-        "PSAL",
-        "TDAG",
-        "TBTH",
-        "TFTH",
-        "TUND",
-    ):
-        return False
-
-    return True
-
-
 def generate_table(stores):
-    table = Table()
+    table = Table(box=box.SIMPLE)
     table.add_column("Store")
     table.add_column("Count", justify="right")
 
@@ -69,7 +39,7 @@ def main():
     with Progress() as progress:
         task = progress.add_task("Processing cards...", start=False)
         mtgjsondata = MtgjsonData()
-        objects = list(mtgjsondata.load_objects(legal_card_filter))
+        objects = list(mtgjsondata.load_objects())
         progress.update(task, total=len(objects))
         progress.start_task(task)
 

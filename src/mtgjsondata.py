@@ -276,12 +276,52 @@ class MtgjsonSetListFile:
     meta: MtgjsonMeta
 
 
+def legal_card_filter(card):
+    if "Card" in card.types:
+        return False
+
+    if card.border_color in ("gold", "silver"):
+        return False
+
+    if "shandalar" in card.availability:
+        return False
+
+    if card.layout == "emblem":
+        return False
+
+    if card.set_type in ("funny", "memorabilia", "promo"):
+        return False
+
+    if card.set_code in (
+        "THP1",
+        "THP2",
+        "THP3",
+        "PSAL",
+        "TDAG",
+        "TBTH",
+        "TFTH",
+        "TUND",
+    ):
+        return False
+
+    return True
+
+
 class MtgjsonData:
     def __init__(self):
         self._all_identifiers: list[Union[MtgjsonCardSet, MtgjsonCardToken]] = None
         self._atomic_cards: list[MtgjsonCardAtomic] = None
         self._set_list: list[MtgjsonSetList] = None
         self._creature_types: list[Subtype] = None
+
+    def get_card_by_name(self, name: str):
+        objects = self.load_objects()
+        card = next(
+            (c for c in objects if c.name == name),
+            None,
+        )
+        assert card is not None
+        return card
 
     @cached_property
     def all_identifiers(self) -> list[Union[MtgjsonCardSet, MtgjsonCardToken]]:
@@ -331,7 +371,7 @@ class MtgjsonData:
         return set(t for t in creature_types if t not in unwanted_types)
 
     def load_objects(
-        self, filterfunc: Optional[Callable[[MagicObject], bool]] = None
+        self, filterfunc: Optional[Callable[[MagicObject], bool]] = legal_card_filter
     ) -> Generator[MagicObject, None, None]:
         MagicObject.all_creature_types = self.creature_types
 
