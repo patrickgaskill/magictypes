@@ -2,7 +2,7 @@ import re
 from copy import deepcopy
 from dataclasses import dataclass
 from datetime import datetime
-from typing import ClassVar, Literal, NewType, Optional, TypeVar
+from typing import ClassVar, Literal, NewType, Optional
 
 ObjectType = Literal["object", "card", "token"]
 Color = Literal["W", "U", "B", "R", "G"]
@@ -11,7 +11,6 @@ Subtype = NewType("Subtype", str)
 Supertype = NewType("Supertype", str)
 Keyword = NewType("Keyword", str)
 TypeKey = tuple[tuple[Supertype, ...], tuple[CardType, ...], tuple[Subtype, ...]]
-T = TypeVar("T")
 
 COLOR_ORDER: dict[Color, int] = {"W": 0, "U": 1, "B": 2, "R": 3, "G": 4}
 
