@@ -15,7 +15,7 @@ def generate_table(stores):
     table.add_column("Count", justify="right")
 
     for store in stores:
-        table.add_row(store.name, f"{store.count}")
+        table.add_row(store.name, f"{len(store)}")
     return table
 
 

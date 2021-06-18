@@ -43,8 +43,7 @@ class UniqueStore:
                 decklistfile.write(f"1 {card.name} [{card.set_code}] {card.number}\n")
         return decklist_path
 
-    @property
-    def count(self) -> int:
+    def __len__(self) -> int:
         return len(self.store.keys())
 
 
