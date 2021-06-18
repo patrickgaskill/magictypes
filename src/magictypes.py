@@ -36,7 +36,7 @@ def main():
         maximal_affected_tokens,
     )
 
-    with Progress() as progress:
+    with Progress(transient=True) as progress:
         progress.console.log("Starting to load objects")
         task = progress.add_task("Processing cards...", start=False)
         mtgjsondata = MtgjsonData()
