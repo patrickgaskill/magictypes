@@ -197,5 +197,30 @@ class MagicObject:
                 value.cache_clear()
 
 
+@dataclass
 class MagicToken:
-    pass
+    name: Optional[str]
+    types: set[CardType]
+    subtypes: set[Subtype]
+    supertypes: set[Supertype]
+    power: Optional[str]
+    toughness: Optional[str]
+    text: Optional[str]
+    colors: set[Color] = field(default_factory=set)
+    keywords: set[Keyword] = field(default_factory=set)
+    subtype_order: dict[Subtype, int] = field(
+        init=False, repr=False, default_factory=dict
+    )
+
+    def __post_init__(self):
+        if not self.name:
+            self.name = " ".join(self.subtypes)
+
+        if isinstance(self.subtypes, Sequence):
+            self.subtype_order = {s: i for i, s in enumerate(self.subtypes)}
+
+        self.types = set(self.types)
+        self.subtypes = set(self.subtypes)
+        self.supertypes = set(self.supertypes)
+        self.keywords = set(self.keywords)
+        self.availability = set(self.availability)
