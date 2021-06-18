@@ -5,20 +5,20 @@ from magicobjects import MagicObject, Subtype
 from utils import get_data_json
 
 
-def legal_card_filter(card, sets):
-    if "Card" in card["types"]:
+def legal_card_filter(obj, sets):
+    if "Card" in obj["types"]:
         return False
 
-    if card["borderColor"] in ("gold", "silver"):
+    if obj["borderColor"] in ("gold", "silver"):
         return False
 
-    if "shandalar" in card["availability"]:
+    if "shandalar" in obj["availability"]:
         return False
 
-    if card["layout"] == "emblem":
+    if obj["layout"] == "emblem":
         return False
 
-    if card["setCode"] in (
+    if obj["setCode"] in (
         "THP1",
         "THP2",
         "THP3",
@@ -30,8 +30,8 @@ def legal_card_filter(card, sets):
     ):
         return False
 
-    if card["setCode"] in sets:
-        s = sets[card["setCode"]]
+    if obj["setCode"] in sets:
+        s = sets[obj["setCode"]]
 
         if s["type"] in ("funny", "memorabilia", "promo"):
             return False
@@ -77,36 +77,35 @@ class MtgjsonData:
         sets = {s["code"]: s for s in self.set_list}
         MagicObject.sets = sets
 
-        for card in self.all_identifiers.values():
-            if callable(filterfunc) and not filterfunc(card, sets):
+        for obj in self.all_identifiers.values():
+            if callable(filterfunc) and not filterfunc(obj, sets):
                 continue
 
             set_release_date = None
             set_type = None
-            if card["setCode"] in sets:
-                s = sets[card["setCode"]]
+            if obj["setCode"] in sets:
+                s = sets[obj["setCode"]]
                 set_release_date = s["releaseDate"]
                 set_type = s["type"]
 
             magic_obj = MagicObject(
-                name=card["name"],
+                name=obj["name"],
                 types=set(
-                    t for t in card["types"] if t != "Token"
+                    t for t in obj["types"] if t != "Token"
                 ),  # mtgjson adds a fake Token type to token objects
-                subtypes=set(card["subtypes"]),
-                supertypes=set(card["supertypes"]),
-                keywords=set(card["keywords"]) if "keywords" in card else set(),
-                set_code=card["setCode"],
+                subtypes=obj["subtypes"],
+                supertypes=obj["supertypes"],
+                keywords=obj["keywords"] if "keywords" in obj else {},
+                set_code=obj["setCode"],
                 set_release_date=set_release_date,
                 set_type=set_type,
-                original_release_date=card["originalReleaseDate"]
-                if "originalReleaseDate" in card
+                original_release_date=obj["originalReleaseDate"]
+                if "originalReleaseDate" in obj
                 else None,
-                number=card["number"],
-                border_color=card["borderColor"],
-                availability=set(card["availability"]),
-                layout=card["layout"],
-                subtype_order={t: i for i, t in enumerate(card["subtypes"])},
+                number=obj["number"],
+                border_color=obj["borderColor"],
+                availability=set(obj["availability"]),
+                layout=obj["layout"],
             )
 
             yield magic_obj

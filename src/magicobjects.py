@@ -1,10 +1,10 @@
 import re
-from dataclasses import dataclass
+from collections.abc import Sequence
+from dataclasses import dataclass, field
 from datetime import datetime
 from functools import cached_property
 from typing import ClassVar, Literal, NewType, Optional
 
-ObjectType = Literal["object", "card", "token"]
 Color = Literal["W", "U", "B", "R", "G"]
 CardType = NewType("Type", str)
 Subtype = NewType("Subtype", str)
@@ -35,14 +35,17 @@ SUPERTYPE_ORDER: dict[Supertype, int] = {
 @dataclass
 class MagicObject:
     all_creature_types: ClassVar[set[Subtype]]
-    basic_land_types: ClassVar[set[Subtype]] = set(
-        ["Forest", "Island", "Mountain", "Plains", "Swamp"]
-    )
+    basic_land_types: ClassVar[set[Subtype]] = {
+        "Forest",
+        "Island",
+        "Mountain",
+        "Plains",
+        "Swamp",
+    }
     name: str
     types: set[CardType]
     subtypes: set[Subtype]
     supertypes: set[Supertype]
-    keywords: set[Keyword]
     set_code: str
     set_release_date: Optional[str]
     set_type: Optional[str]
@@ -51,7 +54,20 @@ class MagicObject:
     border_color: str
     availability: set[str]
     layout: str
-    subtype_order: dict[Subtype, int]
+    keywords: set[Keyword] = field(default_factory=set)
+    subtype_order: dict[Subtype, int] = field(
+        init=False, repr=False, default_factory=dict
+    )
+
+    def __post_init__(self):
+        if isinstance(self.subtypes, Sequence):
+            self.subtype_order = {s: i for i, s in enumerate(self.subtypes)}
+
+        self.types = set(self.types)
+        self.subtypes = set(self.subtypes)
+        self.supertypes = set(self.supertypes)
+        self.keywords = set(self.keywords)
+        self.availability = set(self.availability)
 
     @property
     def release_date(self) -> str:
@@ -91,13 +107,25 @@ class MagicObject:
         )
 
     @cached_property
-    def type_str(self) -> str:
-        formatted = " ".join(
-            sorted(self.supertypes, key=lambda x: SUPERTYPE_ORDER[x])
-            + sorted(
-                self.types, key=lambda x: TYPE_ORDER[x] if x in TYPE_ORDER else 999
-            )
+    def sorted_supertypes(self) -> list[Supertype]:
+        return sorted(self.supertypes, key=lambda x: SUPERTYPE_ORDER[x])
+
+    @cached_property
+    def sorted_types(self) -> list[CardType]:
+        return sorted(
+            self.types, key=lambda x: TYPE_ORDER[x] if x in TYPE_ORDER else 999
         )
+
+    @cached_property
+    def sorted_subtypes(self) -> list[Subtype]:
+        return sorted(
+            self.subtypes,
+            key=lambda x: self.subtype_order[x] if x in self.subtype_order else 999,
+        )
+
+    @cached_property
+    def type_str(self) -> str:
+        formatted = " ".join(self.sorted_supertypes + self.sorted_types)
 
         subtypes = self.subtypes
         notes = []
@@ -150,7 +178,7 @@ class MagicObject:
         return MagicObject(
             name=self.name,
             types=self.types.copy(),
-            subtypes=self.subtypes.copy(),
+            subtypes=self.sorted_subtypes,
             supertypes=self.supertypes.copy(),
             keywords=self.keywords.copy(),
             set_code=self.set_code,
@@ -161,10 +189,13 @@ class MagicObject:
             border_color=self.border_color,
             availability=self.availability.copy(),
             layout=self.layout,
-            subtype_order=self.subtype_order.copy(),
         )
 
     def clear_cached_properties(self) -> None:
         for value in vars(self).values():
             if hasattr(value, "cache_clear"):
                 value.cache_clear()
+
+
+class MagicToken:
+    pass
