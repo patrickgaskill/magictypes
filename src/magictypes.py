@@ -55,15 +55,11 @@ def main() -> None:
             if card.is_token:
                 unique_tokens.evaluate(card)
                 maximal_tokens.evaluate(card)
-
-                for affected_card in after_effects(card):
-                    maximal_affected_tokens.evaluate(affected_card)
+                maximal_affected_tokens.evaluate(card, after_effects)
             else:
                 unique.evaluate(card)
                 maximal.evaluate(card)
-
-                for affected_card in after_effects(card):
-                    maximal_affected.evaluate(affected_card)
+                maximal_affected.evaluate(card, after_effects)
 
                 if card.name == "Grist, the Hunger Tide":
                     grist_copy = card.copy()
@@ -72,8 +68,7 @@ def main() -> None:
                     grist_copy.clear_cached_properties()
                     unique.evaluate(grist_copy)
                     maximal.evaluate(grist_copy)
-                    for affected_grist in after_effects(grist_copy):
-                        maximal_affected.evaluate(affected_grist)
+                    maximal_affected.evaluate(grist_copy, after_effects)
 
             progress.advance(task)
 

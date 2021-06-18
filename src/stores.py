@@ -1,5 +1,6 @@
 import csv
 from pathlib import Path
+from typing import Callable, Optional
 
 from magicobjects import MagicObject, TypeKey
 
@@ -9,7 +10,15 @@ class Store:
         self.store: dict[TypeKey, MagicObject] = {}
         self.name: str = name
 
-    def evaluate(self, _: MagicObject) -> bool:
+    def evaluate(
+        self, card: MagicObject, apply_effects: Optional[Callable] = None
+    ) -> bool:
+        if callable(apply_effects):
+            for affected_card in apply_effects(card):
+                self.evaluate(affected_card)
+
+        self.store[card.type_key] = True
+
         return False
 
     def write_csv(self, output_path: Path) -> str:
@@ -41,7 +50,13 @@ class Store:
 
 
 class UniqueStore(Store):
-    def evaluate(self, card: MagicObject) -> bool:
+    def evaluate(
+        self, card: MagicObject, apply_effects: Optional[Callable] = None
+    ) -> bool:
+        if callable(apply_effects):
+            for affected_card in apply_effects(card):
+                self.evaluate(affected_card)
+
         if (
             card.type_key not in self.store
             or card.sort_key < self.store[card.type_key].sort_key
@@ -57,7 +72,13 @@ class MaximalStore(Store):
         super().__init__(name)
         self.eliminated_keys: dict[TypeKey, MagicObject] = {}
 
-    def evaluate(self, card: MagicObject) -> bool:
+    def evaluate(
+        self, card: MagicObject, apply_effects: Optional[Callable] = None
+    ) -> bool:
+        if callable(apply_effects):
+            for affected_card in apply_effects(card):
+                self.evaluate(affected_card)
+
         if card.type_key in self.eliminated_keys:
             return False
 
