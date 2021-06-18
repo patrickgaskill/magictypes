@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from rich import box
 from rich.console import Console
 from rich.progress import Progress
@@ -5,22 +7,28 @@ from rich.table import Table
 
 from effects import after_effects
 from mtgjsondata import MtgjsonData
-from stores import MaximalStore, UniqueStore
+from stores import MaximalStore, Store, UniqueStore
 from utils import make_output_dir
 
+console = Console()
 
-def generate_table(stores):
+
+def generate_output(stores: list[Store]) -> None:
+    output_path = make_output_dir()
     table = Table(box=box.SIMPLE)
     table.add_column("Store")
-    table.add_column("Count", justify="right")
+    table.add_column("Count", justify="right", style="cyan")
+    table.add_column("File", style="magenta")
 
     for store in stores:
-        table.add_row(store.name, f"{len(store)}")
-    return table
+        csv_path = store.write_csv(output_path)
+        store.write_decklist(output_path)
+        table.add_row(store.name, str(len(store)), str(Path(*csv_path.parts[-2:])))
+
+    console.print(table)
 
 
-def main():
-    console = Console()
+def main() -> None:
     unique = UniqueStore("unique cards")
     maximal = MaximalStore("maximal cards")
     maximal_affected = MaximalStore("maximal affected cards")
@@ -69,15 +77,7 @@ def main():
 
             progress.advance(task)
 
-    output_path = make_output_dir()
-    console.print(f"Created directory {output_path}")
-    for store in stores:
-        csv_path = store.write_csv(output_path)
-        console.print(f"Created CSV file {csv_path}")
-        decklist_path = store.write_decklist(output_path)
-        console.print(f"Created decklist file {decklist_path}")
-
-    console.print(generate_table(stores))
+    generate_output(stores)
 
 
 if __name__ == "__main__":

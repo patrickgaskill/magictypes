@@ -4,19 +4,12 @@ from pathlib import Path
 from magicobjects import MagicObject, TypeKey
 
 
-class UniqueStore:
+class Store:
     def __init__(self, name: str):
         self.store: dict[TypeKey, MagicObject] = {}
         self.name: str = name
 
-    def evaluate(self, card: MagicObject) -> bool:
-        if (
-            card.type_key not in self.store
-            or card.sort_key < self.store[card.type_key].sort_key
-        ):
-            self.store[card.type_key] = card
-            return True
-
+    def evaluate(self, _: MagicObject) -> bool:
         return False
 
     def write_csv(self, output_path: Path) -> str:
@@ -47,7 +40,19 @@ class UniqueStore:
         return len(self.store.keys())
 
 
-class MaximalStore(UniqueStore):
+class UniqueStore(Store):
+    def evaluate(self, card: MagicObject) -> bool:
+        if (
+            card.type_key not in self.store
+            or card.sort_key < self.store[card.type_key].sort_key
+        ):
+            self.store[card.type_key] = card
+            return True
+
+        return False
+
+
+class MaximalStore(Store):
     def __init__(self, name: str):
         super().__init__(name)
         self.eliminated_keys: dict[TypeKey, MagicObject] = {}
@@ -56,15 +61,15 @@ class MaximalStore(UniqueStore):
         if card.type_key in self.eliminated_keys:
             return False
 
-        # if the type already exists replace it only if this card is older
+        # If the type already exists, replace it only if this card is older
         if card.type_key in self.store:
             if card.sort_key < self.store[card.type_key].sort_key:
                 self.store[card.type_key] = card
                 return True
             return False
 
-        # if card is a subset to any saved card then bail out
-        # if keys are a subset to card, delete those keys
+        # If card is a subset to any saved card then bail out
+        # If any saved keys are a subset to this card, delete those keys
         keys_to_delete = []
         for other_key, other in self.store.items():
             if card.is_type_subset(other):
