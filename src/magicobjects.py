@@ -146,7 +146,7 @@ class MagicObject:
             self.expanded_subtypes, self.supertypes
         ) < other.types.union(other.expanded_subtypes, other.supertypes)
 
-    def get_copy(self) -> "MagicObject":
+    def copy(self) -> "MagicObject":
         return MagicObject(
             name=self.name,
             types=self.types.copy(),
