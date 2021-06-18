@@ -60,7 +60,7 @@ def main():
                     maximal_affected.evaluate(affected_card)
 
                 if card.name == "Grist, the Hunger Tide":
-                    grist_copy = card.get_copy()
+                    grist_copy = card.copy()
                     grist_copy.types.add("Creature")
                     grist_copy.subtypes.add("Insect")
                     grist_copy.clear_cached_properties()
@@ -72,12 +72,12 @@ def main():
             progress.advance(task)
 
     output_path = make_output_dir()
-    console.log(f"Created directory {output_path}")
+    console.print(f"Created directory {output_path}")
     for store in stores:
         csv_path = store.write_csv(output_path)
-        console.log(f"Created CSV file {csv_path}")
+        console.print(f"Created CSV file {csv_path}")
         decklist_path = store.write_decklist(output_path)
-        console.log(f"Created decklist file {decklist_path}")
+        console.print(f"Created decklist file {decklist_path}")
 
     console.print(generate_table(stores))
 

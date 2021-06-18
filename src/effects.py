@@ -2,11 +2,11 @@ from magicobjects import MagicObject
 
 
 def after_effects(card: MagicObject) -> list[MagicObject]:
-    returned_cards = [card.get_copy()]
+    returned_cards = [card.copy()]
 
     # Moritte of the Frost is a copy so doesn't see the following type-changing effects
     if card.is_permanent:
-        moritte_copy = card.get_copy()
+        moritte_copy = card.copy()
         moritte_copy.supertypes |= {"Legendary", "Snow"}
         if "Creature" in moritte_copy.types:
             # moritte_copy.subtypes |= card.all_creature_types
@@ -15,7 +15,7 @@ def after_effects(card: MagicObject) -> list[MagicObject]:
 
     # Dermotaxi (copy creature from GY and add Vehicle artifact)
     if not card.is_token and "Creature" in card.types:
-        dermotaxi_copy = card.get_copy()
+        dermotaxi_copy = card.copy()
         dermotaxi_copy.types.add("Artifact")
         dermotaxi_copy.subtypes.add("Vehicle")
         returned_cards.append(dermotaxi_copy)
