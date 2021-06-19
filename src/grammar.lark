@@ -1,19 +1,21 @@
 start: [paragraph (_NEWLINE paragraph)*]
 paragraph: keywords reminder?
-         | loyalty_cost? sentence* creation_sentences+ sentence* reminder?
-         | loyalty_cost? emblem_sentence
-         | loyalty_cost? sentence+ reminder?
-        //  | sentence_ending_with_choice
-         | bulleted_sentence reminder?
+         | prefix? sentence* creation_sentences+ sentence* reminder?
+         | prefix? emblem_sentence
+         | prefix? sentence+ reminder?
+         | level
+         | level_effect
          | reminder
 
+prefix: loyalty_cost | "•"
 reminder: /\([^)]+\)/
-keywords: WORD+ "—"? SYMBOL* ("," WORD+ "—"? SYMBOL*)*
-
+keywords: WORD+ "—"? SYMBOL* (/[,;]/ WORD+ "—"? SYMBOL*)*
+level: "LEVEL" ((INT "-" INT) | (INT "+"))
+level_effect: power_toughness
 // sentence: text+ "."
 sentence: text+ ("—" | "." | "\"" sentence+ "\"")
 // sentence_ending_with_choice: text+ "—" 
-bulleted_sentence: "•" sentence (sentence)*
+// bulleted_sentence: "•" sentence (sentence)*
 
 emblem_sentence.2: text+ "\"" creation_sentences "\""
 creation_sentences: sentence_with_create sentence_following_create?
@@ -47,7 +49,10 @@ create: /creates?/i "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?
       | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "at the beginning of the next end step" "."
       | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "unless that creature's controller pays {3}" "."
       | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "instead if seven or more cards are in your graveyard" "."
+      | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "for each creature in your party."
       | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords named "at the beginning of the next end step" "."
+      | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ ", where X is" text+ "."
+      | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ ", then attach Mask of Immolation to it."
       | /creates?/i quantity colors SUBTYPE+ TYPE+ /tokens?/ named "that's attacking" "."
       | /creates?/i quantity colors SUBTYPE+ TYPE+ /tokens?/ "."
       | /creates?/i quantity colors SUBTYPE+ TYPE+ /tokens?/ named "attached to another target permanent" "."
@@ -56,6 +61,7 @@ create: /creates?/i "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?
       | /creates?/i "X" PREDEFINED_TOKEN /tokens?/ "."
       | /creates?/i quantity PREDEFINED_TOKEN /tokens?/ "."
       | /creates?/i quantity PREDEFINED_TOKEN /tokens?/ "," quantity PREDEFINED_TOKEN /tokens?/ ", and" quantity PREDEFINED_TOKEN /tokens?/ "."
+      | /creates?/i quantity PREDEFINED_TOKEN /tokens?/ "and exile the top card of that player's library."
       | /creates?/i "X" /tokens?/ "that are copies" text+ "."
       | /creates?/i quantity /tokens?/ "that's a copy" text+ "."
       | "create a token that's a copy of that creature, except it's a" SUBTYPE "in addition to its other types and it has \"" RULES_TEXT "\""
@@ -69,6 +75,7 @@ create: /creates?/i "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?
       | /creates?/i quantity colors SNOW TYPE+ /tokens?/ named with_rules
 
 
+
 sentence_following_create.2: "It has \"" RULES_TEXT "\""
                          | "The token has" KEYWORD "and" KEYWORD "."
                          | "It has" KEYWORD "and \"" RULES_TEXT "\""
@@ -76,7 +83,8 @@ sentence_following_create.2: "It has \"" RULES_TEXT "\""
                          | "Those creatures have \"" RULES_TEXT "\""
                          | "It has" KEYWORD ", \"" RULES_TEXT "\" and" KEYWORD "."
 
-quantity: "a" | "an" | "two" | "three" | "four" | "eight" | "thirteen" | "that many"
+// quantity: "a" | "an" | "two" | "three" | "four" | "five" | "six" | "eight" | "thirteen" | "that many"
+quantity: WORD | "that many"
 legendary_name: TOKEN_NAME ","
 TOKEN_NAME: (CAP_WORD (" " CAP_WORD)*) [(" " WORD)+ (" " CAP_WORD)+]
 LEGENDARY: "legendary"
@@ -97,12 +105,13 @@ with_keyword_and_rules: "with" KEYWORD "and \"" RULES_TEXT "\""
 SNOW: "snow"
 PREDEFINED_TOKEN: "Food" | "Clue" | "Treasure" | "Shard" | "Gold" | "Walker"
 
-text: "would create" | WORD | INT | SYMBOL | power_toughness | power_toughness_modifier | reminder | quoted | /[:,!]/
+text: "would create" | WORD | INT | SYMBOL | power_toughness | power_toughness_modifier | reminder | quoted | /[\/:,!]/
 quoted: /"[^"]+[^.]"/
 quoted_ending: /"[^"]+\.'?"/
 loyalty_cost: /\[[+−]?(?:X|\d+)\]:/
 SYMBOL: /{(?:CHAOS|[0-9WUBRGTCSXE])(?:\/[WUBRG])?}/
-power_toughness_modifier: ("+" | "-") INT "/" ("+" | "-") INT
+// power_toughness_modifier: ("+" | "-") (INT | "X") "/" ("+" | "-") (INT | "X")
+power_toughness_modifier: /[+-]\w+\/[+-]\w+/
 
 RULES_TEXT: /[^"]+/
 KEYWORD: "protection from black"
@@ -120,6 +129,7 @@ KEYWORD: "protection from black"
        | "exalted"
        | "enchant permanent"
        | "totem armor"
+       | "forestwalk"
 
 // with_quoted: "with" (KEYWORD "and")? "\"" RULES_TEXT "\""
 // that_are: ("that's" | "that are") ("tapped and"? "attacking" | "blocking that creature" | "blocking target creature attacking you")
