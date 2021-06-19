@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Iterable
 
 from rich import box
 from rich.console import Console
@@ -13,7 +14,7 @@ from utils import make_output_dir
 console = Console()
 
 
-def generate_output(stores: list[Store]) -> None:
+def generate_output(stores: Iterable[Store]) -> None:
     output_path = make_output_dir()
     table = Table(box=box.SIMPLE)
     table.add_column("Store")
