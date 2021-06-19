@@ -43,17 +43,20 @@ class MagicObject:
         "Swamp",
     }
     name: str
-    types: set[CardType]
-    subtypes: set[Subtype]
-    supertypes: set[Supertype]
     set_code: str
-    set_release_date: Optional[str]
-    set_type: Optional[str]
-    original_release_date: Optional[str]
     number: str
     border_color: str
-    availability: set[str]
     layout: str
+    set_release_date: Optional[str] = None
+    set_type: Optional[str] = None
+    original_release_date: Optional[str] = None
+    text: Optional[str] = None
+    availability: set[str] = field(default_factory=set)
+    colors: set[Color] = field(default_factory=set)
+    types: set[CardType] = field(default_factory=set)
+    subtypes: set[Subtype] = field(default_factory=set)
+    supertypes: set[Supertype] = field(default_factory=set)
+
     keywords: set[Keyword] = field(default_factory=set)
     subtype_order: dict[Subtype, int] = field(
         init=False, repr=False, default_factory=dict
@@ -63,6 +66,7 @@ class MagicObject:
         if isinstance(self.subtypes, Sequence):
             self.subtype_order = {s: i for i, s in enumerate(self.subtypes)}
 
+        self.colors = set(self.colors)
         self.types = set(self.types)
         self.subtypes = set(self.subtypes)
         self.supertypes = set(self.supertypes)
@@ -189,6 +193,7 @@ class MagicObject:
             border_color=self.border_color,
             availability=self.availability.copy(),
             layout=self.layout,
+            text=self.text,
         )
 
     def clear_cached_properties(self) -> None:
@@ -199,7 +204,8 @@ class MagicObject:
 
 @dataclass
 class MagicToken:
-    name: Optional[str] = None
+    name: str = None
+    colors: set[Color] = field(default_factory=set)
     types: set[CardType] = field(default_factory=set)
     subtypes: set[Subtype] = field(default_factory=set)
     supertypes: set[Supertype] = field(default_factory=set)
@@ -208,9 +214,7 @@ class MagicToken:
     text: Optional[str] = None
     colors: set[Color] = field(default_factory=set)
     keywords: set[Keyword] = field(default_factory=set)
-    subtype_order: dict[Subtype, int] = field(
-        init=False, repr=False, default_factory=dict
-    )
+    subtype_order: dict[Subtype, int] = field(init=False, default_factory=dict)
 
     def __post_init__(self):
         if not self.name:
@@ -219,13 +223,14 @@ class MagicToken:
         if isinstance(self.subtypes, Sequence):
             self.subtype_order = {s: i for i, s in enumerate(self.subtypes)}
 
+        self.colors = set(self.colors)
         self.types = set(self.types)
         self.subtypes = set(self.subtypes)
         self.supertypes = set(self.supertypes)
         self.keywords = set(self.keywords)
 
-    def __getattr__(self, name):
-        pass
+    def __getattr__(self, _):
+        """Added so pylint doesn't complain about dynamic properties."""
 
 
 predefined_tokens = {

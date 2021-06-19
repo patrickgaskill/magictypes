@@ -90,6 +90,7 @@ class MtgjsonData:
 
             magic_obj = MagicObject(
                 name=obj["name"],
+                colors=obj["colors"],
                 types=set(
                     t for t in obj["types"] if t != "Token"
                 ),  # mtgjson adds a fake Token type to token objects
@@ -106,6 +107,7 @@ class MtgjsonData:
                 border_color=obj["borderColor"],
                 availability=set(obj["availability"]),
                 layout=obj["layout"],
+                text=obj["text"] if "text" in obj else None,
             )
 
             yield magic_obj
