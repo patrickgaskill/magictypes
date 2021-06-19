@@ -77,9 +77,8 @@ sentence_following_create.2: "It has \"" RULES_TEXT "\""
                          | "It has" KEYWORD ", \"" RULES_TEXT "\" and" KEYWORD "."
 
 quantity: "a" | "an" | "two" | "three" | "four" | "eight" | "thirteen" | "that many"
-legendary_name: LEGENDARY_NAME ","
-LEGENDARY_NAME: /[A-Z][^,]+/
-TOKEN_NAME: CAP_WORD (" " CAP_WORD)? (" of" " the"? (" " CAP_WORD)+)?
+legendary_name: TOKEN_NAME ","
+TOKEN_NAME: (CAP_WORD (" " CAP_WORD)*) [(" " WORD)+ (" " CAP_WORD)+]
 LEGENDARY: "legendary"
 power_toughness: POWER "/" TOUGHNESS
 POWER: INT | "X"

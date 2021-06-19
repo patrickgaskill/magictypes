@@ -57,7 +57,7 @@ class TokenExtractor:
                     # Replace a trailing comma with a period and uppercase the first letter
                     text = re.sub(r",$", r".", str(t))
                     characteristics["text"] = text[0].upper() + text[1:]
-                elif t.type == "TOKEN_NAME" or t.type == "LEGENDARY_NAME":
+                elif t.type == "TOKEN_NAME":
                     characteristics["name"] = str(t)
                 elif t.type == "LEGENDARY":
                     characteristics["supertypes"].append(str("Legendary"))
