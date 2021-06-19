@@ -1,5 +1,7 @@
 import pytest
 
+from magicobjects import MagicToken
+
 
 @pytest.mark.parametrize(
     "name,expected",
@@ -66,3 +68,31 @@ def test_is_type_subset(mtgjsondata, name_a, name_b, expected_ab, expected_ba):
 def test_type_key(mtgjsondata, name, expected):
     card = mtgjsondata.get_card_by_name(name)
     assert card.type_key == expected
+
+
+@pytest.mark.parametrize(
+    "token,expected",
+    [
+        (
+            MagicToken.Gold,
+            MagicToken(
+                types=["Artifact"],
+                subtypes=["Gold"],
+                text="Sacrifice this artifact: Add one mana of any color.",
+            ),
+        ),
+        (
+            MagicToken.Walker,
+            MagicToken(
+                name="Walker",
+                colors=["B"],
+                types=["Creature"],
+                subtypes=["Zombie"],
+                power="2",
+                toughness="2",
+            ),
+        ),
+    ],
+)
+def test_predefined_tokens(token, expected):
+    assert token == expected

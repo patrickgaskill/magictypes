@@ -199,13 +199,13 @@ class MagicObject:
 
 @dataclass
 class MagicToken:
-    name: Optional[str]
-    types: set[CardType]
-    subtypes: set[Subtype]
-    supertypes: set[Supertype]
-    power: Optional[str]
-    toughness: Optional[str]
-    text: Optional[str]
+    name: Optional[str] = None
+    types: set[CardType] = field(default_factory=set)
+    subtypes: set[Subtype] = field(default_factory=set)
+    supertypes: set[Supertype] = field(default_factory=set)
+    power: Optional[str] = None
+    toughness: Optional[str] = None
+    text: Optional[str] = None
     colors: set[Color] = field(default_factory=set)
     keywords: set[Keyword] = field(default_factory=set)
     subtype_order: dict[Subtype, int] = field(
@@ -223,4 +223,46 @@ class MagicToken:
         self.subtypes = set(self.subtypes)
         self.supertypes = set(self.supertypes)
         self.keywords = set(self.keywords)
-        self.availability = set(self.availability)
+
+    def __getattr__(self, name):
+        pass
+
+
+predefined_tokens = {
+    "Gold": {
+        "types": ["Artifact"],
+        "subtypes": ["Gold"],
+        "text": "Sacrifice this artifact: Add one mana of any color.",
+    },
+    "Clue": {
+        "types": ["Artifact"],
+        "subtypes": ["Gold"],
+        "text": "{2}, Sacrifice this artifact: Draw a card.",
+    },
+    "Treasure": {
+        "types": ["Artifact"],
+        "subtypes": ["Treasure"],
+        "text": "{T}, Sacrifice this artifact: Add one mana of any color.",
+    },
+    "Food": {
+        "types": ["Artifact"],
+        "subtypes": ["Food"],
+        "text": "{2}, {T}, Sacrifice this artifact: You gain 3 life.",
+    },
+    "Shard": {
+        "types": ["Enchantment"],
+        "subtypes": ["Shard"],
+        "text": "{2}, Sacrifice this enchantment: Scry 1, then draw a card.",
+    },
+    "Walker": {
+        "name": "Walker",
+        "colors": ["B"],
+        "types": ["Creature"],
+        "subtypes": ["Zombie"],
+        "power": "2",
+        "toughness": "2",
+    },
+}
+
+for name, attrs in predefined_tokens.items():
+    setattr(MagicToken, name, MagicToken(**attrs))
