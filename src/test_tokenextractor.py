@@ -888,6 +888,7 @@ test_cases = [
             )
         ],
     ),
+    ("Infiltrator il-Kor", []),
 ]
 
 

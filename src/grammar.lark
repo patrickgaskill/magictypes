@@ -8,7 +8,7 @@ paragraph: keywords reminder?
          | reminder
 
 reminder: /\([^)]+\)/
-keywords: WORD+ SYMBOL* ("," WORD+ SYMBOL*)*
+keywords: WORD+ "—"? SYMBOL* ("," WORD+ "—"? SYMBOL*)*
 
 // sentence: text+ "."
 sentence: text+ ("—" | "." | "\"" sentence+ "\"")
@@ -97,7 +97,7 @@ with_keyword_and_rules: "with" KEYWORD "and \"" RULES_TEXT "\""
 SNOW: "snow"
 PREDEFINED_TOKEN: "Food" | "Clue" | "Treasure" | "Shard" | "Gold" | "Walker"
 
-text: "would create" | WORD | INT | SYMBOL | power_toughness | power_toughness_modifier | reminder | quoted | /[:—,!]/
+text: "would create" | WORD | INT | SYMBOL | power_toughness | power_toughness_modifier | reminder | quoted | /[:,!]/
 quoted: /"[^"]+[^.]"/
 quoted_ending: /"[^"]+\.'?"/
 loyalty_cost: /\[[+−]?(?:X|\d+)\]:/
