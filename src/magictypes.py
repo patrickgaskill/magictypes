@@ -24,7 +24,7 @@ def generate_output(stores: Iterable[Store]) -> None:
     for store in stores:
         csv_path = store.write_csv(output_path)
         store.write_decklist(output_path)
-        table.add_row(store.name, str(len(store)), str(Path(*csv_path.parts[-2:])))
+        table.add_row(store.name, f"{len(store)}", f"{Path(*csv_path.parts[-2:])}")
 
     console.print(table)
 
