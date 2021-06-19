@@ -18,6 +18,7 @@ requests = "*"
 marshmallow-dataclass = "*"
 marshmallow-polyfield = "*"
 orjson = "*"
+regex = "*"
 
 [requires]
 python_version = "3.9.2"

@@ -12,7 +12,9 @@ class TokenExtractor:
 
     def __init__(self):
         with Path(__file__).with_name("grammar.lark").open("r") as f:
-            self.parser = Lark(f.read(), parser="earley", ambiguity="resolve")
+            self.parser = Lark(
+                f.read(), regex=True, parser="earley", ambiguity="resolve"
+            )
 
     def extract_from_text(self, text: str) -> list[MagicToken]:
         if not text:
