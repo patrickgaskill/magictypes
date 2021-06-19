@@ -876,6 +876,18 @@ test_cases = [
             )
         ],
     ),
+    (
+        "Omen of the Sun",
+        [
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Human", "Soldier"],
+                power="1",
+                toughness="1",
+            )
+        ],
+    ),
 ]
 
 
