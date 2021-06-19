@@ -4,7 +4,7 @@ from rich.progress import Progress
 from mtgjsondata import MtgjsonData
 from tokenextractor import TokenExtractor
 
-with Progress(transient=True) as progress:
+with Progress() as progress:
     task = progress.add_task("Processing cards...", start=False)
     mtgjsondata = MtgjsonData()
     extractor = TokenExtractor()
@@ -17,6 +17,7 @@ with Progress(transient=True) as progress:
             tokens = extractor.extract_from_card(card)
         except (UnexpectedEOF, UnexpectedCharacters) as err:
             progress.console.print(f"[bold cyan]{card.name}")
+            progress.console.print(f"{card.text}")
             progress.console.print(f"[red]{err}")
             quit()
 
