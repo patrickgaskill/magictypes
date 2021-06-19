@@ -3,19 +3,16 @@ paragraph: keywords reminder?
          | loyalty_cost? sentence* creation_sentences+ sentence* reminder?
          | loyalty_cost? emblem_sentence
          | loyalty_cost? sentence+ reminder?
-         | sentence_ending_with_choice
-         | bulleted_sentence
+        //  | sentence_ending_with_choice
+         | bulleted_sentence reminder?
          | reminder
 
 reminder: /\([^)]+\)/
 keywords: WORD+ SYMBOL* ("," WORD+ SYMBOL*)*
 
 // sentence: text+ "."
-sentence: "If you would create a Clue, Food, or Treasure token, instead create one of each."
-        | "If an effect would create one or more tokens under your control, it creates twice that many of those tokens instead."
-        | text+ quoted_ending
-        | text+ "."
-sentence_ending_with_choice: text+ "—" 
+sentence: text+ ("—" | "." | "\"" sentence+ "\"")
+// sentence_ending_with_choice: text+ "—" 
 bulleted_sentence: "•" sentence (sentence)*
 
 emblem_sentence.2: text+ "\"" creation_sentences "\""
@@ -32,6 +29,9 @@ create: /creates?/i "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?
       | /creates?/i legendary_name quantity LEGENDARY power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "."
       | /creates?/i quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "."
       | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "."
+      | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "and you gain 2 life" "."
+      | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "for each land you control" "."
+      | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "that's tapped and attacking" "."
       | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords ", where X is" text+ "."
       | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "."
       | /creates?/i quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "for each Equipment attached to" text+ "."
@@ -60,6 +60,8 @@ create: /creates?/i "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?
       | /creates?/i quantity /tokens?/ "that's a copy" text+ "."
       | "create a token that's a copy of that creature, except it's a" SUBTYPE "in addition to its other types and it has \"" RULES_TEXT "\""
       | "create" ("two" | "twice that many") "of those tokens instead."
+      | "creates twice that many of those tokens instead."
+      | "create one of each."
       | /creates?/i quantity power_toughness SUBTYPE+ TYPE+ /tokens?/ that_are_colors "."
       | /creates?/i "X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ named ", where X is" text+ "."
       | /creates?/i quantity power_toughness TYPE+ /tokens?/ "of the chosen color and type" "."
@@ -127,11 +129,11 @@ PREDEFINED_TOKEN: "Food" | "Clue" | "Treasure" | "Shard" | "Gold" | "Walker"
 
 // it_has: "It has \"" RULES_TEXT "\""
 
-text: WORD | INT | SYMBOL | power_toughness | power_toughness_modifier | reminder | quoted | /[:—,!]/
+text: "would create" | WORD | INT | SYMBOL | power_toughness | power_toughness_modifier | reminder | quoted | /[:—,!]/
 quoted: /"[^"]+[^.]"/
 quoted_ending: /"[^"]+\.'?"/
 loyalty_cost: /\[[+−]?(?:X|\d+)\]:/
-SYMBOL: /{(?:CHAOS|[0-9WUBRGTCSXE])}/
+SYMBOL: /{(?:CHAOS|[0-9WUBRGTCSXE])(?:\/[WUBRG])?}/
 power_toughness_modifier: ("+" | "-") INT "/" ("+" | "-") INT
 
 RULES_TEXT: /[^"]+/
@@ -166,8 +168,8 @@ KEYWORD: "protection from black"
 
 
 // CAP_WORD: /\b[A-Z](?:[^\d\W]|[-'])+\b/
-CAP_WORD: /\b(?!creates?\b)[A-Z][âa-zA-Z0-9\-']+\b/
-WORD: /\b(?!creates?\b)[âa-zA-Z0-9\-']+\b/i
+CAP_WORD: /\b(?!creates?\b)[A-Z][íâa-zA-Z0-9\-'']+/
+WORD: /\b(?!creates?\b)[íâa-zA-Z0-9\-'']+/i
 %import common.INT
 %import common.NEWLINE -> _NEWLINE
 %import common.WS_INLINE
