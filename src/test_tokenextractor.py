@@ -889,6 +889,32 @@ test_cases = [
         ],
     ),
     ("Infiltrator il-Kor", []),
+    (
+        "Phyrexian Processor",
+        [
+            MagicToken(
+                colors=["B"],
+                types=["Creature"],
+                subtypes=["Phyrexian", "Minion"],
+                power="X",
+                toughness="X",
+            )
+        ],
+    ),
+    (
+        "Retreat to Emeria",
+        [
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Kor", "Ally"],
+                power="1",
+                toughness="1",
+            )
+        ],
+    ),
+    ("Ragavan, Nimble Pilferer", [MagicToken.Treasure]),
+    ("Caravan Escort", []),
 ]
 
 
