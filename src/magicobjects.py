@@ -214,7 +214,9 @@ class MagicToken:
     text: Optional[str] = None
     colors: set[Color] = field(default_factory=set)
     keywords: set[Keyword] = field(default_factory=set)
-    subtype_order: dict[Subtype, int] = field(init=False, default_factory=dict)
+    subtype_order: dict[Subtype, int] = field(
+        init=False, repr=False, default_factory=dict
+    )
 
     def __post_init__(self):
         if not self.name:
