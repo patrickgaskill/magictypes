@@ -11,4 +11,4 @@ def mtgjsondata():
 
 @pytest.fixture(scope="session")
 def extractor():
-    return TokenExtractor()
+    return TokenExtractor(debug=True)

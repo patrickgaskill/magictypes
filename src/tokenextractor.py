@@ -1,16 +1,27 @@
-import re
 from collections import defaultdict
 from pathlib import Path
 
+import regex
 from lark import Lark, Token
 
 from magicobjects import MagicObject, MagicToken
 
 
+# Potential overrides:
+# Outlaw's Merriment
+# Sarpadian Empires
 class TokenExtractor:
-    color_map = {"white": "W", "blue": "U", "black": "B", "red": "R", "green": "G"}
+    color_map: dict[str, str] = {
+        "white": "W",
+        "blue": "U",
+        "black": "B",
+        "red": "R",
+        "green": "G",
+    }
+    debug: bool
 
-    def __init__(self):
+    def __init__(self, debug=False):
+        self.debug = debug
         with Path(__file__).with_name("grammar.lark").open("r") as f:
             self.parser = Lark(
                 f.read(), regex=True, parser="earley", ambiguity="resolve"
@@ -21,12 +32,30 @@ class TokenExtractor:
             return []
 
         tree = self.parser.parse(text)
+        if self.debug:
+            print(tree.pretty())
         tokens = []
 
         for top_token in self.tree_to_tokens(tree):
             tokens.append(top_token)
             if top_token.text:
-                fixed_text = re.sub(r"'([^']+)'", r'"\1"', top_token.text)
+                if self.debug:
+                    print(f"Parsing token text: {top_token.text}")
+
+                # Replaced single-quoted rules with double quotes
+                fixed_text = regex.sub(r"'([^']+)'", r'"\1"', top_token.text)
+                if self.debug:
+                    print(f"With replaced quotes: {top_token.text}")
+
+                # If the quoted text didn't end in a period, add one
+                match = regex.search(r'"[^"]+[^.]"$', fixed_text)
+                if self.debug:
+                    print("Match:", match)
+                if match:
+                    fixed_text = fixed_text[:-1] + "." + fixed_text[-1:]
+
+                if self.debug:
+                    print(f"Token text changed to: {fixed_text}")
                 subtokens = self.extract_from_text(fixed_text)
                 tokens.extend(subtokens)
 
@@ -37,7 +66,7 @@ class TokenExtractor:
 
     def tree_to_tokens(self, tree):
         tokens = []
-        for creator in tree.find_data("creation_sentences"):
+        for creator in tree.find_data("token_creation"):
             characteristics = defaultdict(list)
 
             for t in creator.scan_values(lambda v: isinstance(v, Token)):
@@ -53,9 +82,9 @@ class TokenExtractor:
                     characteristics["toughness"] = str(t)
                 elif t.type == "KEYWORD":
                     characteristics["keywords"].append(str(t))
-                elif t.type == "RULES_TEXT":
+                elif t.type == "RULES_TEXT" or t.type == "INNER_RULES_TEXT":
                     # Replace a trailing comma with a period and uppercase the first letter
-                    text = re.sub(r",$", r".", str(t))
+                    text = regex.sub(r",$", r".", str(t))
                     characteristics["text"] = text[0].upper() + text[1:]
                 elif t.type == "TOKEN_NAME":
                     characteristics["name"] = str(t)

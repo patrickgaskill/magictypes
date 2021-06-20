@@ -42,7 +42,7 @@ class Store:
         decklist_path = output_path / (self.name.replace(" ", "_") + "_decklist.txt")
         with decklist_path.open("w") as decklistfile:
             for card in self.store.values():
-                decklistfile.write(f"1 {card.name} [{card.set_code}] {card.number}\n")
+                decklistfile.write(f"1 [{card.set_code}] {card.name}\n")
         return decklist_path
 
     def __len__(self) -> int:

@@ -3,6 +3,176 @@ import pytest
 from magicobjects import MagicToken
 
 test_cases = [
+    (
+        "Basri Ket",
+        [
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Soldier"],
+                power="1",
+                toughness="1",
+            ),
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Soldier"],
+                power="1",
+                toughness="1",
+            ),
+        ],
+    ),
+    (
+        "Sporoloth Ancient",
+        [
+            MagicToken(
+                colors=["G"],
+                types=["Creature"],
+                subtypes=["Saproling"],
+                power="1",
+                toughness="1",
+            )
+        ],
+    ),
+    (
+        "Toggo, Goblin Weaponsmith",
+        [
+            MagicToken(
+                types=["Artifact"],
+                subtypes=["Equipment"],
+                name="Rock",
+                text="Equipped creature has '{1}, {T}, Sacrifice Rock: This creature deals 2 damage to any target'",
+                keywords=["equip {1}"],
+            )
+        ],
+    ),
+    (
+        "Outlaws' Merriment",
+        [
+            MagicToken(
+                colors=["W", "R"],
+                types=["Creature"],
+            )
+        ],
+    ),
+    (
+        "Rise from the Tides",
+        [
+            MagicToken(
+                colors=["B"],
+                types=["Creature"],
+                subtypes=["Zombie"],
+                power="2",
+                toughness="2",
+            )
+        ],
+    ),
+    ("Esix, Fractal Bloom", []),
+    (
+        "Urza's Saga",
+        [
+            MagicToken(
+                types=["Artifact", "Creature"],
+                subtypes=["Construct"],
+                power="0",
+                toughness="0",
+                text="This creature gets +1/+1 for each artifact you control.",
+            )
+        ],
+    ),
+    (
+        "Blot Out the Sky",
+        [
+            MagicToken(
+                colors=["W", "B"],
+                types=["Creature"],
+                subtypes=["Inkling"],
+                power="2",
+                toughness="1",
+                keywords=["flying"],
+            )
+        ],
+    ),
+    (
+        "Pest Infestation",
+        [
+            MagicToken(
+                colors=["B", "G"],
+                types=["Creature"],
+                subtypes=["Pest"],
+                power="1",
+                toughness="1",
+                text="When this creature dies, you gain 1 life.",
+            )
+        ],
+    ),
+    (
+        "Invocation of Saint Traft",
+        [
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Angel"],
+                power="4",
+                toughness="4",
+                keywords=["flying"],
+            )
+        ],
+    ),
+    (
+        "Assemble the Rank and Vile",
+        [
+            MagicToken(
+                colors=["B"],
+                types=["Creature"],
+                subtypes=["Zombie"],
+                power="2",
+                toughness="2",
+            )
+        ],
+    ),
+    ("Koth of the Hammer", []),
+    ("Gadrak, the Crown-Scourge", [MagicToken.Treasure]),
+    (
+        "Voice of Resurgence",
+        [
+            MagicToken(
+                colors=["W", "G"],
+                types=["Creature"],
+                subtypes=["Elemental"],
+                text="This creature's power and toughness are each equal to the number of creatures you control.",
+            )
+        ],
+    ),
+    (
+        "Evangel of Heliod",
+        [
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Soldier"],
+                power="1",
+                toughness="1",
+            )
+        ],
+    ),
+    (
+        "Soul Separator",
+        [MagicToken(colors=["B"], types=["Creature"], subtypes=["Zombie"])],
+    ),
+    (
+        "Nested Shambler",
+        [
+            MagicToken(
+                colors=["G"],
+                types=["Creature"],
+                subtypes=["Squirrel"],
+                power="1",
+                toughness="1",
+            )
+        ],
+    ),
+    ("Tireless Provisioner", [MagicToken.Food, MagicToken.Treasure]),
     ("Merfolk of the Pearl Trident", []),
     ("Akrasan Squire", []),
     (
@@ -830,10 +1000,10 @@ test_cases = [
     (
         "Hofri Ghostforge",
         [
-            MagicToken(
-                subtypes=["Spirit"],
-                text="When this creature leaves the battlefield, return the exiled card to its owner's graveyard.",
-            )
+            # MagicToken(
+            #     subtypes=["Spirit"],
+            #     text="When this creature leaves the battlefield, return the exiled card to its owner's graveyard.",
+            # )
         ],
     ),
     ("Kaboom!", []),
@@ -921,5 +1091,6 @@ test_cases = [
 @pytest.mark.parametrize("name,expected", test_cases)
 def test_tokens(mtgjsondata, extractor, name, expected):
     card = mtgjsondata.get_card_by_name(name)
+    print(card.text)
     tokens = extractor.extract_from_card(card)
     assert tokens == expected
