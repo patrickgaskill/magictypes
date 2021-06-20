@@ -12,12 +12,12 @@ keyword_ability: WORD+ "—"? SYMBOL* (("or" | "and/or") SYMBOL+)?
 keyword_abilities: keyword_ability (/[,;]/ keyword_ability)*
 level: "LEVEL" ((INT "-" INT) | (INT "+"))
 level_pt: power_toughness
-sentence: text+ ("—" | "." | "\"" sentence+ "\"" | "'" sentence+ "'")
+sentence: text+ ("—" | "." | /"/ sentence+ /"/ | /(?<!\w)'/ sentence+ /'/)
 
 token_creation: text* /creates?/i create sentence_following_create?
 creation_sentences: token_creation
-                  | text* "\"" sentence* token_creation sentence* "\""
-                  | text* "'" sentence* token_creation sentence* "'"
+                  | text* /"/ sentence* token_creation sentence* /"/
+                  | text* /(?<!\w)'/ sentence* token_creation sentence* /'/
 
 create: "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "equal to" text+ "."
       | "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "equal to" text+ "."
@@ -64,13 +64,15 @@ create: "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywo
       | quantity colors SUBTYPE+ TYPE+ /tokens?/ named "that's attacking" "."
       | quantity colors SUBTYPE+ TYPE+ /tokens?/ "."
       | quantity colors SUBTYPE+ TYPE+ /tokens?/ named "attached to another target permanent" "."
+      | quantity colors SUBTYPE+ TYPE+ /tokens?/ named with_rules_and_keyword "."
       | quantity power_toughness TYPE+ /tokens?/ "of the chosen color and type, where X is" text+ "."
       | quantity colors TYPE+ /tokens?/ named with_rules
-      | "X" PREDEFINED_TOKEN /tokens?/ "."
-      | quantity PREDEFINED_TOKEN /tokens?/ "."
+      // | "X" PREDEFINED_TOKEN /tokens?/ "."
+      // | quantity PREDEFINED_TOKEN /tokens?/ "."
+      | (quantity | "X") PREDEFINED_TOKEN /tokens?/ rest_of_sentence
       | quantity PREDEFINED_TOKEN /tokens?/ "," quantity PREDEFINED_TOKEN /tokens?/ ", and" quantity PREDEFINED_TOKEN /tokens?/ "."
       | quantity PREDEFINED_TOKEN /tokens?/ "or" quantity PREDEFINED_TOKEN /tokens?/ "."
-      | quantity PREDEFINED_TOKEN /tokens?/ "and exile the top card of that player's library."
+      // | quantity PREDEFINED_TOKEN /tokens?/ "and exile the top card of that player's library."
       | (quantity | "X") "tapped"? /tokens?/ ("that's a copy" | "that are copies") rest_of_sentence
       // | quantity "tapped" /tokens?/ "that are copies" rest_of_sentence
       // | quantity /tokens?/ "that's a copy" rest_of_sentence
@@ -85,22 +87,22 @@ create: "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywo
       | quantity colors SNOW TYPE+ /tokens?/ named with_rules
       | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ rest_of_sentence
       | quantity colors SUBTYPE+ TYPE+ /tokens?/ with_rules
-      | quantity PREDEFINED_TOKEN /tokens?/ "for each nontoken creature that died this turn."
-      | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "for each creature that died this turn."
-      | "twice" "X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_rules
+      // | quantity PREDEFINED_TOKEN /tokens?/ "for each nontoken creature that died this turn."
+      // | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "for each creature that died this turn."
+      | "twice X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_rules
       | "X" "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "."
       | quantity colors TYPE+ /tokens?/ rest_of_sentence
-      | quantity colors SUBTYPE+ TYPE+ /tokens?/ named with_rules_and_keyword "."
+
       // | quantity colors SUBTYPE+ TYPE+ /tokens?/ "named Rock with \"Equipped creature has '{1}, {T}, Sacrifice Rock: This creature deals 2 damage to any target'\" and equip {1}."
       // | quantity colors SUBTYPE+ TYPE+ /tokens?/ "named" TOKEN_NAME "with \"" RULES_TEXT "\" and" KEYWORD "."
       
       
 sentence_following_create.2: "It has \"" RULES_TEXT "\""
-                         | "The token has" KEYWORD "and" KEYWORD "."
-                         | "It has" KEYWORD "and \"" RULES_TEXT "\""
-                         | "They each have" KEYWORD "and \"" RULES_TEXT "\""
-                         | "Those creatures have \"" RULES_TEXT "\""
-                         | "It has" KEYWORD ", \"" RULES_TEXT "\" and" KEYWORD "."
+                           | "The token has" KEYWORD "and" KEYWORD "."
+                           | "It has" KEYWORD "and \"" RULES_TEXT "\""
+                           | "They each have" KEYWORD "and \"" RULES_TEXT "\""
+                           | "Those creatures have \"" RULES_TEXT "\""
+                           | "It has" KEYWORD ", \"" RULES_TEXT "\" and" KEYWORD "."
 
 // quantity: "a" | "an" | "two" | "three" | "four" | "five" | "six" | "eight" | "thirteen" | "that many"
 quantity: WORD | "that many"
@@ -123,7 +125,8 @@ that_are_colors: ("that are" | "that's") COLOR "," COLOR ", and" COLOR // Hazezo
 SUBTYPE: CAP_WORD
 TYPE: "creature" | "artifact" | "enchantment" | "land" | "planeswalker"
 
-with_keywords: "with" KEYWORD ("and" KEYWORD)?
+with_keywords.2: "with" KEYWORD _with_and_keywords?
+_with_and_keywords.2: "and" KEYWORD
 with_rules: "with \"" RULES_TEXT "\"" | "with '" INNER_RULES_TEXT "'"
 with_keyword_and_rules: "with" KEYWORD "and \"" RULES_TEXT "\""
 with_rules_and_keyword: "with \"" RULES_TEXT "\" and" KEYWORD
@@ -132,9 +135,9 @@ rest_of_sentence: text* ("—" | "." | "\"" sentence+ "\"" | "'" sentence+ "'")
 
 PREDEFINED_TOKEN: "Food" | "Clue" | "Treasure" | "Shard" | "Gold" | "Walker"
 
-text: "would create" | WORD | INT | SYMBOL | power_toughness_modifier | reminder | quoted | /[\/:,!]/
+text: "would create" | WORD | SYMBOL | power_toughness_modifier | reminder | quoted | /[\/:,!]/
 quoted: /"[^"]+[^.]"/
-quoted_ending: /"[^"]+\.'?"/
+// quoted_ending: /"[^"]+\.'?"/
 loyalty_cost: /\[[+−]?(?:X|\d+)\]:/
 SYMBOL: "{CHAOS}" | "{+1}" | /{[WUBRGCSXTEQ]}/ | /{\d+}/ | /{[WUBRG2]\/[WUBRGP]}/
 power_toughness_modifier: /[+-]\w+\/[+-]\w+/
