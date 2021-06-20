@@ -43,9 +43,9 @@ class TokenExtractor:
                     print(f"Parsing token text: {top_token.text}")
 
                 # Replaced single-quoted rules with double quotes
-                fixed_text = regex.sub(r"'([^']+)'", r'"\1"', top_token.text)
+                fixed_text = regex.sub(r"(?<!\w)'([^']+)'", r'"\1"', top_token.text)
                 if self.debug:
-                    print(f"With replaced quotes: {top_token.text}")
+                    print(f"With replaced quotes: {fixed_text}")
 
                 # If the quoted text didn't end in a period, add one
                 match = regex.search(r'"[^"]+[^.]"$', fixed_text)
