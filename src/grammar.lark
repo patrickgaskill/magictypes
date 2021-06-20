@@ -3,7 +3,7 @@ paragraph: keyword_abilities reminder?
          | prefix? sentence* creation_sentences+ sentence* reminder?
          | prefix? sentence+ reminder?
          | level
-         | level_effect
+         | level_pt
          | reminder
 
 prefix: loyalty_cost | "•" | ("I"+ "—")
@@ -11,7 +11,7 @@ reminder: /\([^)]+\)/
 keyword_ability: WORD+ "—"? SYMBOL* (("or" | "and/or") SYMBOL+)?
 keyword_abilities: keyword_ability (/[,;]/ keyword_ability)*
 level: "LEVEL" ((INT "-" INT) | (INT "+"))
-level_effect: power_toughness
+level_pt: power_toughness
 sentence: text+ ("—" | "." | "\"" sentence+ "\"" | "'" sentence+ "'")
 
 token_creation: text* /creates?/i create sentence_following_create?
@@ -29,8 +29,8 @@ create: "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywo
       | "X" power_toughness SUBTYPE+ TYPE+ /tokens?/ that_are_colors "at the beginning of your next upkeep" ", where X is" text+ "."
       | "X" "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ ", where X is" text+ "."
       | "X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ named ", where X is" text+ "."
-      | legendary_name quantity LEGENDARY power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "."
-      | legendary_name quantity LEGENDARY power_toughness colors SUBTYPE+ TYPE+ /tokens?/ rest_of_sentence
+      // | legendary_name quantity LEGENDARY power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "."
+      | legendary_name quantity LEGENDARY power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords? rest_of_sentence
       // | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "."
       // | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "for each instant and sorcery card in your graveyard."
       | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ rest_of_sentence
@@ -123,13 +123,12 @@ that_are_colors: ("that are" | "that's") COLOR "," COLOR ", and" COLOR // Hazezo
 SUBTYPE: CAP_WORD
 TYPE: "creature" | "artifact" | "enchantment" | "land" | "planeswalker"
 
-// rest_of_sentence: "." | /[^.]+\."?/
-rest_of_sentence: text* ("—" | "." | "\"" sentence+ "\"" | "'" sentence+ "'")
-
 with_keywords: "with" KEYWORD ("and" KEYWORD)?
 with_rules: "with \"" RULES_TEXT "\"" | "with '" INNER_RULES_TEXT "'"
 with_keyword_and_rules: "with" KEYWORD "and \"" RULES_TEXT "\""
 with_rules_and_keyword: "with \"" RULES_TEXT "\" and" KEYWORD
+
+rest_of_sentence: text* ("—" | "." | "\"" sentence+ "\"" | "'" sentence+ "'")
 
 PREDEFINED_TOKEN: "Food" | "Clue" | "Treasure" | "Shard" | "Gold" | "Walker"
 
