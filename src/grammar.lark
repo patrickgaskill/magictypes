@@ -8,7 +8,7 @@ paragraph: keyword_abilities reminder?
 
 prefix: loyalty_cost | "•" | ("I"+ "—")
 reminder: /\([^)]+\)/
-keyword_ability: WORD+ "—"? SYMBOL* (("or" | "and/or") SYMBOL+)?
+keyword_ability: WORD+ "—"? (WORD | SYMBOL)* (("or" | "and/or") SYMBOL+)?
 keyword_abilities: keyword_ability (/[,;]/ keyword_ability)*
 level: "LEVEL" ((INT "-" INT) | (INT "+"))
 level_pt: power_toughness
@@ -30,7 +30,7 @@ create: "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywo
       | "X" "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ ", where X is" text+ "."
       | "X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ named ", where X is" text+ "."
       // | legendary_name quantity LEGENDARY power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "."
-      | legendary_name quantity LEGENDARY power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords? rest_of_sentence
+      | legendary_name power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords? rest_of_sentence
       // | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "."
       // | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "for each instant and sorcery card in your graveyard."
       | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ rest_of_sentence
@@ -77,9 +77,12 @@ create: "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywo
       // | quantity "tapped" /tokens?/ "that are copies" rest_of_sentence
       // | quantity /tokens?/ "that's a copy" rest_of_sentence
       | quantity colors SUBTYPE TYPE "token with power equal to that card's power and toughness equal to that card's toughness."
-      | quantity "of those tokens instead."
+      | quantity "of those tokens instead" rest_of_sentence
+      | "X of those tokens and you gain X life."
       | "one of each."
       | "a copy" rest_of_sentence
+      | "one or more tokens for the first time each turn"
+      | "one of those tokens."
       // | "that many tokens that are copies" rest_of_sentence
       | quantity power_toughness SUBTYPE+ TYPE+ /tokens?/ that_are_colors "."
       | quantity power_toughness TYPE+ /tokens?/ "of the chosen color and type" "."
@@ -107,8 +110,13 @@ sentence_following_create.2: "It has \"" RULES_TEXT "\""
 // quantity: "a" | "an" | "two" | "three" | "four" | "five" | "six" | "eight" | "thirteen" | "that many"
 quantity: WORD | "that many"
 
-TOKEN_NAME: (CAP_WORD (" " CAP_WORD)*) [(" " WORD)+ (" " CAP_WORD)+]
-legendary_name: TOKEN_NAME ","
+// TOKEN_NAME: CAP_WORD (" " WORD)* (", " WORD (" " WORD+)*)?
+// LEGENDARY_NAME: CAP_WORD (" " WORD)* [", " WORD ((" " WORD)* " " CAP_WORD)*]
+LEGENDARY_NAME: /[A-Z][\w\s,]+(?=, a legendary)/
+legendary_name: LEGENDARY_NAME ", a" LEGENDARY
+
+// TOKEN_NAME: (CAP_WORD ((", " | " ") CAP_WORD)*) [(" " WORD)+ (" " CAP_WORD)+]
+TOKEN_NAME: CAP_WORD ((" " WORD)* " " CAP_WORD)*
 named: "named" TOKEN_NAME
 
 LEGENDARY: "legendary"
@@ -120,7 +128,8 @@ TOUGHNESS: INT | "X"
 
 colors: COLOR | COLOR "and" COLOR | COLOR "," COLOR ", and" COLOR
 COLOR: "white" | "blue" | "black" | "red" | "green" | "colorless"
-that_are_colors: ("that are" | "that's") COLOR "," COLOR ", and" COLOR // Hazezon Tamar; Godsire
+ALL_COLORS: "all colors"
+that_are_colors: ("that are" | "that's") (ALL_COLORS | COLOR "," COLOR ", and" COLOR) // Hazezon Tamar; Godsire
 
 SUBTYPE: CAP_WORD
 TYPE: "creature" | "artifact" | "enchantment" | "land" | "planeswalker"
@@ -139,7 +148,7 @@ text: "would create" | WORD | SYMBOL | power_toughness_modifier | reminder | quo
 quoted: /"[^"]+[^.]"/
 // quoted_ending: /"[^"]+\.'?"/
 loyalty_cost: /\[[+−]?(?:X|\d+)\]:/
-SYMBOL: "{CHAOS}" | "{+1}" | /{[WUBRGCSXTEQ]}/ | /{\d+}/ | /{[WUBRG2]\/[WUBRGP]}/
+SYMBOL: "{CHAOS}" | "{+1}" | /{[WUBRGCSXTEPQ]}/ | /{\d+}/ | /{[WUBRG2]\/[WUBRGP]}/
 power_toughness_modifier: /[+-]\w+\/[+-]\w+/
 
 RULES_TEXT: /[^"]+/
@@ -160,6 +169,7 @@ KEYWORD: "protection from " COLOR
        | "enchant permanent"
        | "totem armor"
        | "forestwalk"
+       | "vigilance"
 CAP_WORD: /[A-Z][\w\-']+/
 WORD: /(?!create\b)[\w\-']+/i
 

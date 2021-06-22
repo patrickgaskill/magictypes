@@ -4,6 +4,234 @@ from magicobjects import MagicToken
 
 test_cases = [
     (
+        "Verix Bladewing",
+        [
+            MagicToken(
+                name="Karox Bladewing",
+                colors=["R"],
+                supertypes=["Legendary"],
+                types=["Creature"],
+                subtypes=["Dragon"],
+                power="4",
+                toughness="4",
+                keywords=["flying"],
+            )
+        ],
+    ),
+    (
+        "Tuktuk the Explorer",
+        [
+            MagicToken(
+                name="Tuktuk the Returned",
+                supertypes=["Legendary"],
+                types=["Artifact", "Creature"],
+                subtypes=["Goblin", "Golem"],
+                power="5",
+                toughness="5",
+            )
+        ],
+    ),
+    (
+        "Tomb of Urami",
+        [
+            MagicToken(
+                name="Urami",
+                colors=["B"],
+                supertypes=["Legendary"],
+                types=["Creature"],
+                subtypes=["Demon", "Spirit"],
+                power="5",
+                toughness="5",
+                keywords=["flying"],
+            )
+        ],
+    ),
+    (
+        "Tolsimir Wolfblood",
+        [
+            MagicToken(
+                name="Voja",
+                colors=["W", "G"],
+                supertypes=["Legendary"],
+                types=["Creature"],
+                subtypes=["Wolf"],
+                power="2",
+                toughness="2",
+            )
+        ],
+    ),
+    (
+        "Kari Zev, Skyship Raider",
+        [
+            MagicToken(
+                name="Ragavan",
+                colors=["R"],
+                supertypes=["Legendary"],
+                types=["Creature"],
+                subtypes=["Monkey"],
+                power="2",
+                toughness="1",
+            )
+        ],
+    ),
+    (
+        "Helm of Kaldra",
+        [
+            MagicToken(
+                name="Kaldra",
+                supertypes=["Legendary"],
+                types=["Creature"],
+                subtypes=["Avatar"],
+                power="4",
+                toughness="4",
+            )
+        ],
+    ),
+    (
+        "Jiang Yanggu",
+        [
+            MagicToken(
+                name="Mowu",
+                colors=["G"],
+                supertypes=["Legendary"],
+                types=["Creature"],
+                subtypes=["Dog"],
+                power="3",
+                toughness="3",
+            )
+        ],
+    ),
+    (
+        "Brood Birthing",
+        [
+            MagicToken(
+                types=["Creature"],
+                subtypes=["Eldrazi", "Spawn"],
+                power="0",
+                toughness="1",
+                text="Sacrifice this creature: Add {C}.",
+            )
+        ],
+    ),
+    ("Rage Extractor", []),
+    (
+        "Planewide Celebration",
+        [
+            MagicToken(
+                colors=["W", "U", "B", "R", "G"],
+                types=["Creature"],
+                subtypes=["Citizen"],
+                power="2",
+                toughness="2",
+            )
+        ],
+    ),
+    (
+        "Silverwing Squadron",
+        [
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Knight"],
+                power="2",
+                toughness="2",
+                keywords=["vigilance"],
+            )
+        ],
+    ),
+    (
+        "Militant Angel",
+        [
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Knight"],
+                power="2",
+                toughness="2",
+                keywords=["vigilance"],
+            )
+        ],
+    ),
+    (
+        "Nissa, Sage Animist",
+        [
+            MagicToken(
+                name="Ashaya, the Awoken World",
+                colors=["G"],
+                supertypes=["Legendary"],
+                types=["Creature"],
+                subtypes=["Elemental"],
+                power="4",
+                toughness="4",
+            )
+        ],
+    ),
+    (
+        "From Under the Floorboards",
+        [
+            MagicToken(
+                colors=["B"],
+                types=["Creature"],
+                subtypes=["Zombie"],
+                power="2",
+                toughness="2",
+            )
+        ],
+    ),
+    (
+        "Akim, the Soaring Wind",
+        [
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Bird"],
+                power="1",
+                toughness="1",
+                keywords=["flying"],
+            ),
+        ],
+    ),
+    (
+        "Throne of Empires",
+        [
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Soldier"],
+                power="1",
+                toughness="1",
+            ),
+        ],
+    ),
+    (
+        "Old-Growth Troll",
+        [
+            MagicToken(
+                colors=["G"],
+                types=["Creature"],
+                subtypes=["Troll", "Warrior"],
+                power="4",
+                toughness="4",
+                keywords=["trample"],
+            )
+        ],
+    ),
+    ("Arcbound Wanderer", []),
+    (
+        "Tolsimir, Friend to Wolves",
+        [
+            MagicToken(
+                name="Voja, Friend to Elves",
+                colors=["W", "G"],
+                supertypes=["Legendary"],
+                types=["Creature"],
+                subtypes=["Wolf"],
+                power="3",
+                toughness="3",
+            )
+        ],
+    ),
+    (
         "Basri Ket",
         [
             MagicToken(
@@ -432,7 +660,7 @@ test_cases = [
     ),
     ("Aeve, Progenitor Ooze", []),
     (
-        "Extus, Oriq Overlord // Awaken the Blood Avatar",
+        "Awaken the Blood Avatar",
         [
             MagicToken(
                 colors=["B", "R"],

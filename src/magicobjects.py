@@ -43,6 +43,7 @@ class MagicObject:
         "Swamp",
     }
     name: str
+    face_name: Optional[str]
     set_code: str
     number: str
     border_color: str

@@ -1,8 +1,10 @@
-from lark.exceptions import UnexpectedCharacters, UnexpectedEOF
+import csv
+
 from rich.progress import Progress
 
 from mtgjsondata import MtgjsonData, legal_card_filter
 from tokenextractor import TokenExtractor
+from utils import make_output_dir
 
 with Progress() as progress:
     task = progress.add_task("Processing cards...", start=False)
@@ -12,18 +14,35 @@ with Progress() as progress:
     progress.update(task, total=len(cards))
     progress.start_task(task)
     test_cases = {}
+    exceptions = []
 
     for card in cards:
         if card.name in test_cases:
+            progress.advance(task)
             continue
+
+        if card.name in (
+            "Nissa, Vastwood Seer // Nissa, Sage Animist",
+            "Extus, Oriq Overlord // Awaken the Blood Avatar",
+        ):
+            progress.console.print(card.name)
+            progress.console.print(card.text)
+            progress.console.print()
 
         try:
             tokens = extractor.extract_from_card(card)
             test_cases[card.name] = tokens
-        except (UnexpectedEOF, UnexpectedCharacters) as err:
-            progress.console.print(f"[bold cyan]{card.name}")
-            progress.console.print(f"{card.text}")
-            progress.console.print(f"[red]{err}")
-            quit()
-        finally:
-            progress.advance(task)
+        except Exception as err:
+            # progress.console.print(f"[bold cyan]{card.name}")
+            # progress.console.print(f"{card.text}")
+            # progress.console.print(f"[red]{err}")
+            # quit()
+            exceptions.append((card.name, type(err).__name__))
+
+        progress.advance(task)
+
+    output_path = make_output_dir()
+    csv_path = output_path / "exceptions.csv"
+    with csv_path.open("w") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows(exceptions)

@@ -72,6 +72,8 @@ class TokenExtractor:
             for t in creator.scan_values(lambda v: isinstance(v, Token)):
                 if t.type == "COLOR" and t in self.color_map:
                     characteristics["colors"].append(self.color_map[t])
+                elif t.type == "ALL_COLORS":
+                    characteristics["colors"] = ["W", "U", "B", "R", "G"]
                 elif t.type == "SUBTYPE":
                     characteristics["subtypes"].append(str(t))
                 elif t.type == "TYPE":
@@ -86,7 +88,7 @@ class TokenExtractor:
                     # Replace a trailing comma with a period and uppercase the first letter
                     text = regex.sub(r",$", r".", str(t))
                     characteristics["text"] = text[0].upper() + text[1:]
-                elif t.type == "TOKEN_NAME":
+                elif t.type == "TOKEN_NAME" or t.type == "LEGENDARY_NAME":
                     characteristics["name"] = str(t)
                 elif t.type == "LEGENDARY":
                     characteristics["supertypes"].append(str("Legendary"))

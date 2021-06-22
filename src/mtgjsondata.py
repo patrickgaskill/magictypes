@@ -86,9 +86,9 @@ def atomic_card_filter(obj, _):
 
 class MtgjsonData:
     def get_card_by_name(self, name: str):
-        objects = self.load_objects()
+        objects = self.load_objects(filterfunc=legal_card_filter)
         card = next(
-            (c for c in objects if c.name == name),
+            (c for c in objects if c.name == name or c.face_name == name),
             None,
         )
         assert card is not None
@@ -144,6 +144,7 @@ class MtgjsonData:
 
             magic_obj = MagicObject(
                 name=obj["name"],
+                face_name=obj["faceName"] if "faceName" in obj else None,
                 colors=obj["colors"],
                 types=set(
                     t for t in obj["types"] if t != "Token"
