@@ -1,7 +1,8 @@
 start: [paragraph (_NEWLINE paragraph)*]
 paragraph: keyword_abilities reminder?
-         | prefix? sentence* creation_sentences+ sentence* reminder?
-         | prefix? sentence+ reminder?
+        //  | prefix? sentence* creation_sentences+ sentence* reminder?
+        //  | prefix? sentence+ reminder?
+         | prefix? n_sentence+ reminder?
          | level
          | level_pt
          | reminder
@@ -12,47 +13,68 @@ keyword_ability: WORD+ "—"? (WORD | SYMBOL)* (("or" | "and/or") SYMBOL+)?
 keyword_abilities: keyword_ability (/[,;]/ keyword_ability)*
 level: "LEVEL" ((INT "-" INT) | (INT "+"))
 level_pt: power_toughness
-sentence: text+ ("—" | "." | /"/ sentence+ /"/ | /(?<!\w)'/ sentence+ /'/)
 
-token_creation: text* /creates?/i create sentence_following_create?
-creation_sentences: token_creation
-                  | text* /"/ sentence* token_creation sentence* /"/
-                  | text* /(?<!\w)'/ sentence* token_creation sentence* /'/
+// sentence: text+ ("—" | "." | /"/ sentence+ /"/ | /(?<!\w)'/ sentence+ /'/)
 
-create: "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "equal to" text+ "."
-      | "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "equal to" text+ "."
-      | "a number of" PREDEFINED_TOKEN /tokens?/ "equal to" text+ "."
-      | "X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ ", where X is" text+ "."
-      | "X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "."
+// token_creation: text* /creates?/i create sentence_following_create?
+// creation_sentences: token_creation
+//                   | text* /"/ sentence* token_creation sentence* /"/
+//                   | text* /(?<!\w)'/ sentence* token_creation sentence* /'/
+
+// n_creation.2: create sentence_following_create?
+
+n_text.-1: "would create" 
+         | WORD
+         | SYMBOL 
+         | PT_MODIFIER 
+         | reminder 
+         | /[\/:,!]/ 
+         | /"/ n_text+ /"/ 
+         | /(?<!\w)'/ n_text+ /'/
+
+// n_creates.2: /creates?/i create
+// n_sentences_with_create.5: (/creates?/i create | n_text)+ ("—" | "." | /"/ n_sentence+ /"/ | /(?<!\w)'/ n_sentence+ /'/) sentence_following_create?
+
+n_sentence: n_text* /creates?/i create n_text* ("—" | ".")? sentence_following_create?
+          | n_text+ ("—" | "." | /"/ n_sentence+ /"/ | /(?<!\w)'/ n_sentence+ /'/)?
+
+
+create: quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with
+      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with
+      // | "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with "equal to"
+      // | "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "equal to"
+      // | "a number of" PREDEFINED_TOKEN /tokens?/ "equal to"
+      | "X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ ", where X is"
+      | "X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with
       // | "X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "."
-      | "X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ rest_of_sentence
-      | "X" power_toughness SUBTYPE+ TYPE+ /tokens?/ that_are_colors "at the beginning of your next upkeep" ", where X is" text+ "."
-      | "X" "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ ", where X is" text+ "."
-      | "X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ named ", where X is" text+ "."
+      | "X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/
+      | "X" power_toughness SUBTYPE+ TYPE+ /tokens?/ that_are_colors "at the beginning of your next upkeep" ", where X is"
+      | "X" "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ ", where X is"
+      | "X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ named ", where X is"
       // | legendary_name quantity LEGENDARY power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "."
-      | legendary_name power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords? rest_of_sentence
+      | legendary_name power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with?
       // | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "."
       // | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "for each instant and sorcery card in your graveyard."
-      | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ rest_of_sentence
+      | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/
       // | quantity "tapped 2/2 black Zombie creature token."
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "."
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "that are tapped and attacking."
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ ", then put a +1/+1 counter on each creature you control."
-      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords ", where X is" rest_of_sentence
-      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "."
-      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keyword_and_rules
-      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ named "."
-      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ named with_rules
-      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_rules
-      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "instead" "."
-      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords named "."
-      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "at the beginning of the next end step" "."
-      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords named "at the beginning of the next end step" "."
+      // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with ", where X is"
+      // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "with" _with_clause
+      // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with
+      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ named
+      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ named with
+      // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with
+      // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with "instead"
+      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with named
+      // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with "at the beginning of the next end step"
+      // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with named "at the beginning of the next end step"
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "for each Equipment attached to" text+ "."
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "and you gain 2 life" "."
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "for each land you control" "."
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "that's tapped and attacking" "."
-      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "that's tapped and attacking."
+      // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with "that's tapped and attacking"
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "that's blocking target creature attacking you" "."
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "that attacks that player each combat if able" "."
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "that's blocking that creature" "."
@@ -61,54 +83,56 @@ create: "a number of" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywo
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "for each creature in your party."
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ ", where X is" text+ "."
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ ", then attach Mask of Immolation to it."
-      | quantity colors SUBTYPE+ TYPE+ /tokens?/ named "that's attacking" "."
-      | quantity colors SUBTYPE+ TYPE+ /tokens?/ "."
-      | quantity colors SUBTYPE+ TYPE+ /tokens?/ named "attached to another target permanent" "."
-      | quantity colors SUBTYPE+ TYPE+ /tokens?/ named with_rules_and_keyword "."
-      | quantity power_toughness TYPE+ /tokens?/ "of the chosen color and type, where X is" text+ "."
-      | quantity colors TYPE+ /tokens?/ named with_rules
+      // | quantity colors SUBTYPE+ TYPE+ /tokens?/ named "that's attacking"
+      | quantity colors SUBTYPE+ TYPE+ /tokens?/ 
+      // | quantity colors SUBTYPE+ TYPE+ /tokens?/ named "attached to another target permanent"
+      | quantity colors SUBTYPE+ TYPE+ /tokens?/ named with
+      | quantity power_toughness TYPE+ /tokens?/
+      // | quantity power_toughness TYPE+ /tokens?/ "of the chosen color and type, where X is"
+      | quantity colors TYPE+ /tokens?/ named? with
       // | "X" PREDEFINED_TOKEN /tokens?/ "."
       // | quantity PREDEFINED_TOKEN /tokens?/ "."
-      | (quantity | "X") PREDEFINED_TOKEN /tokens?/ rest_of_sentence
-      | quantity PREDEFINED_TOKEN /tokens?/ "," quantity PREDEFINED_TOKEN /tokens?/ ", and" quantity PREDEFINED_TOKEN /tokens?/ "."
-      | quantity PREDEFINED_TOKEN /tokens?/ "or" quantity PREDEFINED_TOKEN /tokens?/ "."
+      | (quantity | "X") PREDEFINED_TOKEN /tokens?/
+      | quantity PREDEFINED_TOKEN /tokens?/ "," quantity PREDEFINED_TOKEN /tokens?/ ", and" quantity PREDEFINED_TOKEN /tokens?/
+      | quantity PREDEFINED_TOKEN /tokens?/ "or" quantity PREDEFINED_TOKEN /tokens?/
       // | quantity PREDEFINED_TOKEN /tokens?/ "and exile the top card of that player's library."
-      | (quantity | "X") "tapped"? /tokens?/ ("that's a copy" | "that are copies") rest_of_sentence
+      | (quantity | "X") "tapped"? /tokens?/ ("that's a copy" | "that are copies")
       // | quantity "tapped" /tokens?/ "that are copies" rest_of_sentence
       // | quantity /tokens?/ "that's a copy" rest_of_sentence
-      | quantity colors SUBTYPE TYPE "token with power equal to that card's power and toughness equal to that card's toughness."
-      | quantity "of those tokens instead" rest_of_sentence
-      | "X of those tokens and you gain X life."
-      | "one of each."
-      | "a copy" rest_of_sentence
+      | quantity colors SUBTYPE TYPE "token with power equal to that card's power and toughness equal to that card's toughness"
+      | quantity "of those tokens instead"
+      | "X of those tokens and you gain X life"
+      | "one of each"
+      | "a copy"
       | "one or more tokens for the first time each turn"
-      | "one of those tokens."
+      | "one of those tokens"
       // | "that many tokens that are copies" rest_of_sentence
-      | quantity power_toughness SUBTYPE+ TYPE+ /tokens?/ that_are_colors "."
-      | quantity power_toughness TYPE+ /tokens?/ "of the chosen color and type" "."
-      | quantity colors SUBTYPE+ TYPE+ /tokens?/ named "."
-      | quantity colors SNOW TYPE+ /tokens?/ named with_rules
-      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ rest_of_sentence
-      | quantity colors SUBTYPE+ TYPE+ /tokens?/ with_rules
+      | quantity power_toughness SUBTYPE+ TYPE+ /tokens?/ that_are_colors
+      // | quantity power_toughness TYPE+ /tokens?/ "of the chosen color and type"
+      | quantity colors SUBTYPE+ TYPE+ /tokens?/ named
+      | quantity colors SNOW TYPE+ /tokens?/ named with
+      | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/
+      | quantity colors SUBTYPE+ TYPE+ /tokens?/ with
       // | quantity PREDEFINED_TOKEN /tokens?/ "for each nontoken creature that died this turn."
       // | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "for each creature that died this turn."
-      | "twice X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_rules
-      | "X" "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with_keywords "."
-      | quantity colors TYPE+ /tokens?/ rest_of_sentence
+      | "twice X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with
+      | "X" "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with
+      // | quantity colors TYPE+ /tokens?/
 
       // | quantity colors SUBTYPE+ TYPE+ /tokens?/ "named Rock with \"Equipped creature has '{1}, {T}, Sacrifice Rock: This creature deals 2 damage to any target'\" and equip {1}."
       // | quantity colors SUBTYPE+ TYPE+ /tokens?/ "named" TOKEN_NAME "with \"" RULES_TEXT "\" and" KEYWORD "."
       
       
-sentence_following_create.2: "It has \"" RULES_TEXT "\""
+sentence_following_create.3: "It has \"" RULES_TEXT "\""
                            | "The token has" KEYWORD "and" KEYWORD "."
                            | "It has" KEYWORD "and \"" RULES_TEXT "\""
                            | "They each have" KEYWORD "and \"" RULES_TEXT "\""
                            | "Those creatures have \"" RULES_TEXT "\""
                            | "It has" KEYWORD ", \"" RULES_TEXT "\" and" KEYWORD "."
+                           | "They have \"" RULES_TEXT "\""
 
 // quantity: "a" | "an" | "two" | "three" | "four" | "five" | "six" | "eight" | "thirteen" | "that many"
-quantity: WORD | "that many"
+quantity: WORD | "that many" | "a number of"
 
 // TOKEN_NAME: CAP_WORD (" " WORD)* (", " WORD (" " WORD+)*)?
 // LEGENDARY_NAME: CAP_WORD (" " WORD)* [", " WORD ((" " WORD)* " " CAP_WORD)*]
@@ -134,22 +158,33 @@ that_are_colors: ("that are" | "that's") (ALL_COLORS | COLOR "," COLOR ", and" C
 SUBTYPE: CAP_WORD
 TYPE: "creature" | "artifact" | "enchantment" | "land" | "planeswalker"
 
-with_keywords.2: "with" KEYWORD _with_and_keywords?
-_with_and_keywords.2: "and" KEYWORD
-with_rules: "with \"" RULES_TEXT "\"" | "with '" INNER_RULES_TEXT "'"
-with_keyword_and_rules: "with" KEYWORD "and \"" RULES_TEXT "\""
-with_rules_and_keyword: "with \"" RULES_TEXT "\" and" KEYWORD
+// with_keywords.2: "with" KEYWORD _with_and_keywords?
+// _with_and_keywords.2: "and" KEYWORD
+// with_rules.99: "with" rules 
+// // | "with '" INNER_RULES_TEXT "'"
+// with_keyword_and_rules.99: "with" KEYWORD "and" rules
+// with_rules_and_keyword.99: "with" rules "and" KEYWORD
+// rules.99: /"/ RULES_TEXT /"/ | /(?<!\w)'/ RULES_TEXT /'/
 
-rest_of_sentence: text* ("—" | "." | "\"" sentence+ "\"" | "'" sentence+ "'")
+with: "with" (KEYWORD ["and" (KEYWORD | rules)] | rules ["and" KEYWORD] | "those characteristics")
+// _with_clause: KEYWORD ["and" (KEYWORD | rules)]
+//               //  | KEYWORD "and" KEYWORD
+//               //  | KEYWORD "and" rules
+//                | rules ["and" KEYWORD]
+//               //  | rules
+//                | "those characteristics"
+rules: /"/ RULES_TEXT /"/ | /(?<!\w)'/ INNER_RULES_TEXT /'/
+
+// rest_of_sentence: text* ("—" | "." | "\"" sentence+ "\"" | "'" sentence+ "'")
 
 PREDEFINED_TOKEN: "Food" | "Clue" | "Treasure" | "Shard" | "Gold" | "Walker"
 
-text: "would create" | WORD | SYMBOL | power_toughness_modifier | reminder | quoted | /[\/:,!]/
-quoted: /"[^"]+[^.]"/
+// text: "would create" | WORD | SYMBOL | PT_MODIFIER | reminder | quoted | /[\/:,!]/
+// quoted: /"[^"]+[^.]"/
 // quoted_ending: /"[^"]+\.'?"/
 loyalty_cost: /\[[+−]?(?:X|\d+)\]:/
 SYMBOL: "{CHAOS}" | "{+1}" | /{[WUBRGCSXTEPQ]}/ | /{\d+}/ | /{[WUBRG2]\/[WUBRGP]}/
-power_toughness_modifier: /[+-]\w+\/[+-]\w+/
+PT_MODIFIER: /[+-]\w+\/[+-]\w+/
 
 RULES_TEXT: /[^"]+/
 INNER_RULES_TEXT: /[^']+/

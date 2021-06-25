@@ -2,7 +2,7 @@ from collections import defaultdict
 from pathlib import Path
 
 import regex
-from lark import Lark, Token
+from lark import Lark, Token, Tree
 
 from magicobjects import MagicObject, MagicToken
 
@@ -36,7 +36,7 @@ class TokenExtractor:
             print(tree.pretty())
         tokens = []
 
-        for top_token in self.tree_to_tokens(tree):
+        for top_token in self.get_tokens_from_tree(tree):
             tokens.append(top_token)
             if top_token.text:
                 if self.debug:
@@ -64,38 +64,42 @@ class TokenExtractor:
     def extract_from_card(self, card: MagicObject) -> list[MagicToken]:
         return self.extract_from_text(card.text)
 
-    def tree_to_tokens(self, tree):
+    def get_tokens_from_tree(self, tree):
         tokens = []
-        for creator in tree.find_data("token_creation"):
+        for sentence in tree.find_data("n_sentence"):
             characteristics = defaultdict(list)
 
-            for t in creator.scan_values(lambda v: isinstance(v, Token)):
-                if t.type == "COLOR" and t in self.color_map:
-                    characteristics["colors"].append(self.color_map[t])
-                elif t.type == "ALL_COLORS":
-                    characteristics["colors"] = ["W", "U", "B", "R", "G"]
-                elif t.type == "SUBTYPE":
-                    characteristics["subtypes"].append(str(t))
-                elif t.type == "TYPE":
-                    characteristics["types"].append(str(t).capitalize())
-                elif t.type == "POWER":
-                    characteristics["power"] = str(t)
-                elif t.type == "TOUGHNESS":
-                    characteristics["toughness"] = str(t)
-                elif t.type == "KEYWORD":
-                    characteristics["keywords"].append(str(t))
-                elif t.type == "RULES_TEXT" or t.type == "INNER_RULES_TEXT":
-                    # Replace a trailing comma with a period and uppercase the first letter
-                    text = regex.sub(r",$", r".", str(t))
-                    characteristics["text"] = text[0].upper() + text[1:]
-                elif t.type == "TOKEN_NAME" or t.type == "LEGENDARY_NAME":
-                    characteristics["name"] = str(t)
-                elif t.type == "LEGENDARY":
-                    characteristics["supertypes"].append(str("Legendary"))
-                elif t.type == "SNOW":
-                    characteristics["supertypes"].append(str("Snow"))
-                elif t.type == "PREDEFINED_TOKEN":
-                    tokens.append(getattr(MagicToken, str(t)))
+            for child in sentence.children:
+                if isinstance(child, Tree) and (
+                    child.data == "create" or child.data == "sentence_following_create"
+                ):
+                    for t in child.scan_values(lambda v: isinstance(v, Token)):
+                        if t.type == "COLOR" and t in self.color_map:
+                            characteristics["colors"].append(self.color_map[t])
+                        elif t.type == "ALL_COLORS":
+                            characteristics["colors"] = ["W", "U", "B", "R", "G"]
+                        elif t.type == "SUBTYPE":
+                            characteristics["subtypes"].append(str(t))
+                        elif t.type == "TYPE":
+                            characteristics["types"].append(str(t).capitalize())
+                        elif t.type == "POWER":
+                            characteristics["power"] = str(t)
+                        elif t.type == "TOUGHNESS":
+                            characteristics["toughness"] = str(t)
+                        elif t.type == "KEYWORD":
+                            characteristics["keywords"].append(str(t))
+                        elif t.type == "RULES_TEXT" or t.type == "INNER_RULES_TEXT":
+                            # Replace a trailing comma with a period and uppercase the first letter
+                            text = regex.sub(r",$", r".", str(t))
+                            characteristics["text"] = text[0].upper() + text[1:]
+                        elif t.type == "TOKEN_NAME" or t.type == "LEGENDARY_NAME":
+                            characteristics["name"] = str(t)
+                        elif t.type == "LEGENDARY":
+                            characteristics["supertypes"].append(str("Legendary"))
+                        elif t.type == "SNOW":
+                            characteristics["supertypes"].append(str("Snow"))
+                        elif t.type == "PREDEFINED_TOKEN":
+                            tokens.append(getattr(MagicToken, str(t)))
 
             if characteristics:
                 tokens.append(MagicToken(**characteristics))
