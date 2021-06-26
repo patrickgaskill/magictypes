@@ -9,7 +9,41 @@ from magicobjects import MagicCard, MagicToken
 
 
 class TokenExtractor:
-    overrides: dict[str, list[MagicToken]] = {
+    has_investigate = (
+        "Briarbridge Patrol",
+        "Bygone Bishop",
+        "Byway Courier",
+        "Confirm Suspicions",
+        "Confront the Unknown",
+        "Daring Sleuth // Bearer of Overwhelming Truths",
+        "Declaration in Stone",
+        "Drownyard Explorers",
+        # "Erdwal Illuminator",
+        "Expose Evil",
+        "Fleeting Memories",
+        "Floodhound",
+        "Funnel-Web Recluse",
+        "Gone Missing",
+        "Hard Evidence",
+        "Humble the Brute",
+        "Jace's Scrutiny",
+        "Lonis, Cryptozoologist",
+        "Magnifying Glass",
+        "Ongoing Investigation",
+        "Press for Answers",
+        "Root Out",
+        "Search the Premises",
+        "Survive the Night",
+        "Tamiyo's Journal",
+        "Thraben Inspector",
+        "Tireless Tracker",
+        "Trail of Evidence",
+        "Ulvenwald Mysteries",
+        "Wavesifter",
+        "Weirding Wood",
+    )
+
+    overrides = {
         "Master of the Wild Hunt Avatar": [
             {
                 "colors": ["G"],
@@ -174,6 +208,10 @@ class TokenExtractor:
             ]
 
         tokens = self.extract_from_text(card.text)
+
+        if card.name in self.has_investigate:
+            tokens.append(MagicToken.Clue)
+
         self._cache[card.name] = [t.asdict() for t in tokens]
         for t in tokens:
             t.creator = card

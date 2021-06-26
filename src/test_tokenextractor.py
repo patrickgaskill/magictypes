@@ -4,6 +4,81 @@ from magicobjects import MagicToken
 
 test_cases = [
     (
+        "Ulvenwald Mysteries",
+        [
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Human", "Soldier"],
+                power="1",
+                toughness="1",
+            ),
+            MagicToken.Clue,
+        ],
+    ),
+    (
+        "Hard Evidence",
+        [
+            MagicToken(
+                colors=["U"],
+                types=["Creature"],
+                subtypes=["Crab"],
+                power="0",
+                toughness="3",
+            ),
+            MagicToken.Clue,
+        ],
+    ),
+    (
+        "The Bears of Littjara",
+        [
+            MagicToken(
+                colors=["U"],
+                types=["Creature"],
+                subtypes=["Shapeshifter"],
+                power="2",
+                toughness="2",
+                keywords=["Changeling"],
+            )
+        ],
+    ),
+    (
+        "Irregular Cohort",
+        [
+            MagicToken(
+                types=["Creature"],
+                subtypes=["Shapeshifter"],
+                power="2",
+                toughness="2",
+                keywords=["Changeling"],
+            )
+        ],
+    ),
+    (
+        "Crib Swap",
+        [
+            MagicToken(
+                types=["Creature"],
+                subtypes=["Shapeshifter"],
+                power="1",
+                toughness="1",
+                keywords=["Changeling"],
+            )
+        ],
+    ),
+    (
+        "Birthing Boughs",
+        [
+            MagicToken(
+                types=["Creature"],
+                subtypes=["Shapeshifter"],
+                power="2",
+                toughness="2",
+                keywords=["Changeling"],
+            )
+        ],
+    ),
+    (
         "Maskwood Nexus",
         [
             MagicToken(
