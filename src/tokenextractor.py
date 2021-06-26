@@ -1,5 +1,4 @@
 from collections import defaultdict
-from dataclasses import asdict
 from pathlib import Path
 
 import regex
