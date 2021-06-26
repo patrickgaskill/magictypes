@@ -10,7 +10,7 @@ with Progress() as progress:
     task = progress.add_task("Processing cards...", start=False)
     mtgjsondata = MtgjsonData()
     extractor = TokenExtractor()
-    cards = list(mtgjsondata.load_objects(filterfunc=legal_card_filter))
+    cards = list(mtgjsondata.load_cards(filterfunc=legal_card_filter))
     progress.update(task, total=len(cards))
     progress.start_task(task)
     test_cases = {}
@@ -20,14 +20,6 @@ with Progress() as progress:
         if card.name in test_cases:
             progress.advance(task)
             continue
-
-        if card.name in (
-            "Nissa, Vastwood Seer // Nissa, Sage Animist",
-            "Extus, Oriq Overlord // Awaken the Blood Avatar",
-        ):
-            progress.console.print(card.name)
-            progress.console.print(card.text)
-            progress.console.print()
 
         try:
             tokens = extractor.extract_from_card(card)

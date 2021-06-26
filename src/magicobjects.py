@@ -34,6 +34,7 @@ SUPERTYPE_ORDER: dict[Supertype, int] = {
 
 @dataclass
 class MagicObject:
+    object_type: ClassVar[str] = "object"
     all_creature_types: ClassVar[set[Subtype]]
     basic_land_types: ClassVar[set[Subtype]] = {
         "Forest",
@@ -43,16 +44,7 @@ class MagicObject:
         "Swamp",
     }
     name: str
-    face_name: Optional[str]
-    set_code: str
-    number: str
-    border_color: str
-    layout: str
-    set_release_date: Optional[str] = None
-    set_type: Optional[str] = None
-    original_release_date: Optional[str] = None
     text: Optional[str] = None
-    availability: set[str] = field(default_factory=set)
     colors: set[Color] = field(default_factory=set)
     types: set[CardType] = field(default_factory=set)
     subtypes: set[Subtype] = field(default_factory=set)
@@ -76,22 +68,19 @@ class MagicObject:
 
     @property
     def release_date(self) -> str:
-        if self.original_release_date:
-            return self.original_release_date
-
-        return self.set_release_date
+        pass
 
     @cached_property
     def is_every_creature_type(self) -> bool:
         return (
             "Changeling" in self.keywords
-            or f"{self.name} is every creature type" in self.text
+            or (self.text and f"{self.name} is every creature type" in self.text)
             or self.subtypes >= self.all_creature_types
         )
 
     @property
     def is_token(self) -> bool:
-        return self.layout == "token"
+        return self.object_type == "token"
 
     @cached_property
     def is_permanent(self) -> bool:
@@ -166,13 +155,7 @@ class MagicObject:
 
     @cached_property
     def sort_key(self) -> tuple[datetime, str, int, str]:
-        release_date = (
-            datetime.fromisoformat(self.release_date)
-            if self.release_date
-            else datetime.max
-        )
-        parsed_number = int(re.sub(r"[^\d]+", "", self.number))
-        return release_date, self.set_code, parsed_number, self.number
+        pass
 
     def is_type_subset(self, other: "MagicObject") -> bool:
         return self.types.union(
@@ -181,6 +164,56 @@ class MagicObject:
 
     def copy(self) -> "MagicObject":
         return MagicObject(
+            name=self.name,
+            types=self.types.copy(),
+            subtypes=self.sorted_subtypes,
+            supertypes=self.supertypes.copy(),
+            keywords=self.keywords.copy(),
+            text=self.text,
+        )
+
+    def clear_cached_properties(self) -> None:
+        for value in vars(self).values():
+            if hasattr(value, "cache_clear"):
+                value.cache_clear()
+
+
+@dataclass
+class MagicCard(MagicObject):
+    object_type: ClassVar[str] = "card"
+    face_name: Optional[str] = None
+    set_code: Optional[str] = None
+    number: Optional[str] = None
+    border_color: Optional[str] = None
+    layout: Optional[str] = None
+    set_release_date: Optional[str] = None
+    set_type: Optional[str] = None
+    original_release_date: Optional[str] = None
+    availability: set[str] = field(default_factory=set)
+    colors: set[Color] = field(default_factory=set)
+    types: set[CardType] = field(default_factory=set)
+    subtypes: set[Subtype] = field(default_factory=set)
+    supertypes: set[Supertype] = field(default_factory=set)
+
+    @property
+    def release_date(self) -> str:
+        if self.original_release_date:
+            return self.original_release_date
+
+        return self.set_release_date
+
+    @cached_property
+    def sort_key(self) -> tuple[datetime, str, int, str]:
+        release_date = (
+            datetime.fromisoformat(self.release_date)
+            if self.release_date
+            else datetime.max
+        )
+        parsed_number = int(re.sub(r"[^\d]+", "", self.number))
+        return release_date, self.set_code, parsed_number, self.number
+
+    def copy(self) -> "MagicCard":
+        return MagicCard(
             name=self.name,
             types=self.types.copy(),
             subtypes=self.sorted_subtypes,
@@ -197,14 +230,10 @@ class MagicObject:
             text=self.text,
         )
 
-    def clear_cached_properties(self) -> None:
-        for value in vars(self).values():
-            if hasattr(value, "cache_clear"):
-                value.cache_clear()
-
 
 @dataclass
 class MagicToken:
+    object_type: ClassVar[str] = "token"
     name: str = None
     colors: set[Color] = field(default_factory=set)
     types: set[CardType] = field(default_factory=set)

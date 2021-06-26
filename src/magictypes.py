@@ -48,7 +48,7 @@ def main() -> None:
     with Progress(transient=True) as progress:
         task = progress.add_task("Processing cards...", start=False)
         mtgjsondata = MtgjsonData()
-        objects = list(mtgjsondata.load_objects(filterfunc=legal_card_filter))
+        objects = list(mtgjsondata.load_cards(filterfunc=legal_card_filter))
         progress.update(task, total=len(objects))
         progress.start_task(task)
 

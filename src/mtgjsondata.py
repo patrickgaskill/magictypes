@@ -1,11 +1,11 @@
 from functools import cached_property
 from typing import Callable, Generator, Literal, Optional
 
-from magicobjects import MagicObject, Subtype
+from magicobjects import MagicCard, MagicObject, Subtype
 from utils import get_data_json
 
 
-def legal_card_filter(obj, sets):
+def legal_card_filter(obj: dict[str, any], sets: dict[str, any]) -> bool:
     if "Card" in obj["types"]:
         return False
 
@@ -15,7 +15,7 @@ def legal_card_filter(obj, sets):
     if "shandalar" in obj["availability"]:
         return False
 
-    if obj["layout"] == "emblem":
+    if obj["layout"] in ("token", "emblem"):
         return False
 
     if obj["setCode"] in (
@@ -86,9 +86,9 @@ def atomic_card_filter(obj, _):
 
 class MtgjsonData:
     def get_card_by_name(self, name: str):
-        objects = self.load_objects(filterfunc=legal_card_filter)
+        cards = self.load_cards(filterfunc=legal_card_filter)
         card = next(
-            (c for c in objects if c.name == name or c.face_name == name),
+            (c for c in cards if c.name == name or c.face_name == name),
             None,
         )
         assert card is not None
@@ -114,15 +114,15 @@ class MtgjsonData:
         unwanted_types = ("Chicken", "Head", "Hornet", "Reveler", "Rukh", "Wasp")
         return set(t for t in creature_types if t not in unwanted_types)
 
-    def load_objects(
+    def load_cards(
         self,
         source: Literal["AllIdentifiers", "AtomicCards"] = "AllIdentifiers",
-        filterfunc: Optional[Callable[[MagicObject], bool]] = None,
-    ) -> Generator[MagicObject, None, None]:
+        filterfunc: Optional[Callable[[dict[str, any]], bool]] = None,
+    ) -> Generator[MagicCard, None, None]:
         MagicObject.all_creature_types = self.creature_types
 
         sets = {s["code"]: s for s in self.set_list}
-        MagicObject.sets = sets
+        MagicCard.sets = sets
 
         if source == "AtomicCards":
             objects = [obj[0] for obj in self.atomic_cards.values()]
@@ -142,7 +142,7 @@ class MtgjsonData:
                 set_release_date = s["releaseDate"]
                 set_type = s["type"]
 
-            magic_obj = MagicObject(
+            magic_card = MagicCard(
                 name=obj["name"],
                 face_name=obj["faceName"] if "faceName" in obj else None,
                 colors=obj["colors"],
@@ -167,7 +167,7 @@ class MtgjsonData:
                 text=obj["text"] if "text" in obj else None,
             )
 
-            yield magic_obj
+            yield magic_card
 
 
 if __name__ == "__main__":
