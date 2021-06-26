@@ -35,7 +35,7 @@ n_text.-1: "would create"
 // n_creates.2: /creates?/i create
 // n_sentences_with_create.5: (/creates?/i create | n_text)+ ("—" | "." | /"/ n_sentence+ /"/ | /(?<!\w)'/ n_sentence+ /'/) sentence_following_create?
 
-n_sentence: n_text* /creates?/i create n_text* ("—" | ".")? sentence_following_create?
+n_sentence: n_text* /creates?/i create n_text* "."? sentence_following_create?
           | n_text+ ("—" | "." | /"/ n_sentence+ /"/ | /(?<!\w)'/ n_sentence+ /'/)?
 
 
@@ -84,35 +84,35 @@ create: quantity "tapped"? power_toughness colors SUBTYPE+ TYPE+ /tokens?/ [with
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ ", where X is" text+ "."
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/ ", then attach Mask of Immolation to it."
       // | quantity colors SUBTYPE+ TYPE+ /tokens?/ named "that's attacking"
-      | quantity colors SUBTYPE+ TYPE+ /tokens?/ 
+      // | quantity colors SUBTYPE+ TYPE+ /tokens?/ 
       // | quantity colors SUBTYPE+ TYPE+ /tokens?/ named "attached to another target permanent"
-      | quantity colors SUBTYPE+ TYPE+ /tokens?/ named with
+      | quantity colors SUBTYPE+ TYPE+ /tokens?/ [named | with | named with]
       | quantity power_toughness TYPE+ /tokens?/
       // | quantity power_toughness TYPE+ /tokens?/ "of the chosen color and type, where X is"
       | quantity colors TYPE+ /tokens?/ named? with
       // | "X" PREDEFINED_TOKEN /tokens?/ "."
       // | quantity PREDEFINED_TOKEN /tokens?/ "."
-      | (quantity | "X") PREDEFINED_TOKEN /tokens?/
       | quantity PREDEFINED_TOKEN /tokens?/ "," quantity PREDEFINED_TOKEN /tokens?/ ", and" quantity PREDEFINED_TOKEN /tokens?/
       | quantity PREDEFINED_TOKEN /tokens?/ "or" quantity PREDEFINED_TOKEN /tokens?/
+      | quantity PREDEFINED_TOKEN /tokens?/
       // | quantity PREDEFINED_TOKEN /tokens?/ "and exile the top card of that player's library."
-      | (quantity | "X") "tapped"? /tokens?/ ("that's a copy" | "that are copies")
+      | quantity "tapped"? /tokens?/ ("that's a copy" | "that are copies")
       // | quantity "tapped" /tokens?/ "that are copies" rest_of_sentence
       // | quantity /tokens?/ "that's a copy" rest_of_sentence
       | quantity colors SUBTYPE TYPE "token with power equal to that card's power and toughness equal to that card's toughness"
-      | quantity "of those tokens instead"
+      | quantity "of those tokens"
       | "X of those tokens and you gain X life"
       | "one of each"
       | "a copy"
       | "one or more tokens for the first time each turn"
-      | "one of those tokens"
+      // | "one of those tokens"
       // | "that many tokens that are copies" rest_of_sentence
       | quantity power_toughness SUBTYPE+ TYPE+ /tokens?/ that_are_colors
       // | quantity power_toughness TYPE+ /tokens?/ "of the chosen color and type"
-      | quantity colors SUBTYPE+ TYPE+ /tokens?/ named
+      // | quantity colors SUBTYPE+ TYPE+ /tokens?/ named
       | quantity colors SNOW TYPE+ /tokens?/ named with
       // | quantity power_toughness colors SUBTYPE+ TYPE+ /tokens?/
-      | quantity colors SUBTYPE+ TYPE+ /tokens?/ with
+      // | quantity colors SUBTYPE+ TYPE+ /tokens?/ with
       // | quantity PREDEFINED_TOKEN /tokens?/ "for each nontoken creature that died this turn."
       // | quantity "tapped" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ "for each creature that died this turn."
       // | "twice X" power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with
