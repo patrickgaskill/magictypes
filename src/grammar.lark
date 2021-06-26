@@ -183,7 +183,7 @@ PREDEFINED_TOKEN: "Food" | "Clue" | "Treasure" | "Shard" | "Gold" | "Walker"
 // quoted: /"[^"]+[^.]"/
 // quoted_ending: /"[^"]+\.'?"/
 loyalty_cost: /\[[+−]?(?:X|\d+)\]:/
-SYMBOL: "{CHAOS}" | "{+1}" | /{[WUBRGCSXTEPQ]}/ | /{\d+}/ | /{[WUBRG2]\/[WUBRGP]}/
+SYMBOL: "{CHAOS}" | "[+1]" | /{[WUBRGCSXTEPQ]}/ | /{\d+}/ | /{[WUBRG2]\/[WUBRGP]}/
 PT_MODIFIER: /[+-]\w+\/[+-]\w+/
 
 RULES_TEXT: /[^"]+/
