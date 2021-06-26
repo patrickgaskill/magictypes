@@ -6,7 +6,7 @@ from utils import get_data_json
 
 
 def legal_card_filter(obj: dict[str, any], sets: dict[str, any]) -> bool:
-    if "Card" in obj["types"]:
+    if {"Card", "Dungeon"} & set(obj["types"]):
         return False
 
     if obj["borderColor"] in ("gold", "silver"):
@@ -35,51 +35,6 @@ def legal_card_filter(obj: dict[str, any], sets: dict[str, any]) -> bool:
 
         if s["type"] in ("funny", "memorabilia", "promo"):
             return False
-
-    return True
-
-
-def atomic_card_filter(obj, _):
-    if "Card" in obj["types"]:
-        return False
-
-    # if obj["borderColor"] in ("gold", "silver"):
-    #     return False
-
-    # if "shandalar" in obj["availability"]:
-    #     return False
-
-    if obj["layout"] == "emblem":
-        return False
-
-    # bad_sets = [
-    #     "THP1",
-    #     "THP2",
-    #     "THP3",
-    #     "PSAL",
-    #     "TDAG",
-    #     "TBTH",
-    #     "TFTH",
-    #     "TUND",
-    # ]
-
-    # if obj["setCode"] in (
-    #     "THP1",
-    #     "THP2",
-    #     "THP3",
-    #     "PSAL",
-    #     "TDAG",
-    #     "TBTH",
-    #     "TFTH",
-    #     "TUND",
-    # ):
-    # return False
-
-    # if obj["setCode"] in sets:
-    #     s = sets[obj["setCode"]]
-
-    #     if s["type"] in ("funny", "memorabilia", "promo"):
-    #         return False
 
     return True
 
@@ -126,7 +81,6 @@ class MtgjsonData:
 
     def load_cards(
         self,
-        source: Literal["AllIdentifiers", "AtomicCards"] = "AllIdentifiers",
         filterfunc: Optional[Callable[[dict[str, any]], bool]] = None,
     ) -> Generator[MagicCard, None, None]:
         MagicObject.all_creature_types = self.creature_types
@@ -134,10 +88,7 @@ class MtgjsonData:
         sets = {s["code"]: s for s in self.set_list}
         MagicCard.sets = sets
 
-        if source == "AtomicCards":
-            objects = [obj[0] for obj in self.atomic_cards.values()]
-        else:
-            objects = self.all_identifiers.values()
+        objects = self.all_identifiers.values()
 
         for obj in objects:
             if callable(filterfunc) and not filterfunc(obj, sets):
