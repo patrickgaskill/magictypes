@@ -4,6 +4,42 @@ from magicobjects import MagicToken
 
 test_cases = [
     (
+        "Master of the Wild Hunt Avatar",
+        [
+            MagicToken(
+                colors=["G"],
+                types=["Creature"],
+                subtypes=["Wolf"],
+                power="2",
+                toughness="2",
+            ),
+            MagicToken(
+                colors=["G"],
+                types=["Creature"],
+                subtypes=["Antelope"],
+                power="2",
+                toughness="3",
+                keywords=["forestwalk"],
+            ),
+            MagicToken(
+                colors=["G"],
+                types=["Creature"],
+                subtypes=["Cat"],
+                power="3",
+                toughness="2",
+                keywords=["shroud"],
+            ),
+            MagicToken(
+                colors=["G"],
+                types=["Creature"],
+                subtypes=["Rhino"],
+                power="4",
+                toughness="4",
+                keywords=["trample"],
+            ),
+        ],
+    ),
+    (
         "Verix Bladewing",
         [
             MagicToken(
@@ -278,11 +314,41 @@ test_cases = [
         "Outlaws' Merriment",
         [
             MagicToken(
-                colors=["W", "R"],
+                colors=["R", "W"],
                 types=["Creature"],
-            )
+                subtypes=["Human", "Warrior"],
+                power="3",
+                toughness="1",
+                keywords=["trample", "haste"],
+            ),
+            MagicToken(
+                colors=["R", "W"],
+                types=["Creature"],
+                subtypes=["Human", "Cleric"],
+                power="2",
+                toughness="1",
+                keywords=["lifelink", "haste"],
+            ),
+            MagicToken(
+                colors=["R", "W"],
+                types=["Creature"],
+                subtypes=["Human", "Rogue"],
+                power="1",
+                toughness="2",
+                keywords=["haste"],
+                text="When this creature enters the battlefield, it deals 1 damage to any target.",
+            ),
         ],
     ),
+    # (
+    #     "Outlaws' Merriment",
+    #     [
+    #         MagicToken(
+    #             colors=["W", "R"],
+    #             types=["Creature"],
+    #         )
+    #     ],
+    # ),
     (
         "Rise from the Tides",
         [
@@ -1026,50 +1092,50 @@ test_cases = [
             )
         ],
     ),
-    # (
-    #     "Sarpadian Empires, Vol. VII",
-    #     [
-    #         MagicToken(
-    #             types=["Creature"],
-    #             power="1",
-    #             toughness="1",
-    #             colors=["W"],
-    #             subtypes=["Citizen"],
-    #         ),
-    #         MagicToken(
-    #             types=["Creature"],
-    #             power="1",
-    #             toughness="1",
-    #             colors=["U"],
-    #             subtypes=["Camarid"],
-    #         ),
-    #         MagicToken(
-    #             types=["Creature"],
-    #             power="1",
-    #             toughness="1",
-    #             colors=["B"],
-    #             subtypes=["Thrull"],
-    #         ),
-    #         MagicToken(
-    #             types=["Creature"],
-    #             power="1",
-    #             toughness="1",
-    #             colors=["R"],
-    #             subtypes=["Goblin"],
-    #         ),
-    #         MagicToken(
-    #             types=["Creature"],
-    #             power="1",
-    #             toughness="1",
-    #             colors=["G"],
-    #             subtypes=["Saproling"],
-    #         ),
-    #     ],
-    # ),
     (
         "Sarpadian Empires, Vol. VII",
-        [MagicToken(types=["Creature"], power="1", toughness="1")],
+        [
+            MagicToken(
+                types=["Creature"],
+                power="1",
+                toughness="1",
+                colors=["W"],
+                subtypes=["Citizen"],
+            ),
+            MagicToken(
+                types=["Creature"],
+                power="1",
+                toughness="1",
+                colors=["U"],
+                subtypes=["Camarid"],
+            ),
+            MagicToken(
+                types=["Creature"],
+                power="1",
+                toughness="1",
+                colors=["B"],
+                subtypes=["Thrull"],
+            ),
+            MagicToken(
+                types=["Creature"],
+                power="1",
+                toughness="1",
+                colors=["R"],
+                subtypes=["Goblin"],
+            ),
+            MagicToken(
+                types=["Creature"],
+                power="1",
+                toughness="1",
+                colors=["G"],
+                subtypes=["Saproling"],
+            ),
+        ],
     ),
+    # (
+    #     "Sarpadian Empires, Vol. VII",
+    #     [MagicToken(types=["Creature"], power="1", toughness="1")],
+    # ),
     (
         "Wasitora, Nekoru Queen",
         [

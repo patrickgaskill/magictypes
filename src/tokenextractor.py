@@ -10,7 +10,108 @@ from magicobjects import MagicObject, MagicToken
 # Potential overrides:
 # Outlaw's Merriment
 # Sarpadian Empires
+# Master of the Wild Hunt avatar
 class TokenExtractor:
+    overrides: dict[str, list[MagicToken]] = {
+        "Master of the Wild Hunt Avatar": [
+            MagicToken(
+                colors=["G"],
+                types=["Creature"],
+                subtypes=["Wolf"],
+                power="2",
+                toughness="2",
+            ),
+            MagicToken(
+                colors=["G"],
+                types=["Creature"],
+                subtypes=["Antelope"],
+                power="2",
+                toughness="3",
+                keywords=["forestwalk"],
+            ),
+            MagicToken(
+                colors=["G"],
+                types=["Creature"],
+                subtypes=["Cat"],
+                power="3",
+                toughness="2",
+                keywords=["shroud"],
+            ),
+            MagicToken(
+                colors=["G"],
+                types=["Creature"],
+                subtypes=["Rhino"],
+                power="4",
+                toughness="4",
+                keywords=["trample"],
+            ),
+        ],
+        "Sarpadian Empires, Vol. VII": [
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Citizen"],
+                power="1",
+                toughness="1",
+            ),
+            MagicToken(
+                colors=["U"],
+                types=["Creature"],
+                subtypes=["Camarid"],
+                power="1",
+                toughness="1",
+            ),
+            MagicToken(
+                colors=["B"],
+                types=["Creature"],
+                subtypes=["Thrull"],
+                power="1",
+                toughness="1",
+            ),
+            MagicToken(
+                colors=["R"],
+                types=["Creature"],
+                subtypes=["Goblin"],
+                power="1",
+                toughness="1",
+            ),
+            MagicToken(
+                colors=["G"],
+                types=["Creature"],
+                subtypes=["Saproling"],
+                power="1",
+                toughness="1",
+            ),
+        ],
+        "Outlaws' Merriment": [
+            MagicToken(
+                colors=["R", "W"],
+                types=["Creature"],
+                subtypes=["Human", "Warrior"],
+                power="3",
+                toughness="1",
+                keywords=["trample", "haste"],
+            ),
+            MagicToken(
+                colors=["R", "W"],
+                types=["Creature"],
+                subtypes=["Human", "Cleric"],
+                power="2",
+                toughness="1",
+                keywords=["lifelink", "haste"],
+            ),
+            MagicToken(
+                colors=["R", "W"],
+                types=["Creature"],
+                subtypes=["Human", "Rogue"],
+                power="1",
+                toughness="2",
+                keywords=["haste"],
+                text="When this creature enters the battlefield, it deals 1 damage to any target.",
+            ),
+        ],
+    }
+
     color_map: dict[str, str] = {
         "white": "W",
         "blue": "U",
@@ -18,6 +119,7 @@ class TokenExtractor:
         "red": "R",
         "green": "G",
     }
+
     debug: bool
 
     def __init__(self, debug=False):
@@ -62,6 +164,8 @@ class TokenExtractor:
         return tokens
 
     def extract_from_card(self, card: MagicObject) -> list[MagicToken]:
+        if card.name in TokenExtractor.overrides:
+            return TokenExtractor.overrides[card.name]
         return self.extract_from_text(card.text)
 
     def get_tokens_from_tree(self, tree):
