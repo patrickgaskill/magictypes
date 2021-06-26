@@ -85,7 +85,7 @@ class MagicObject:
     def is_every_creature_type(self) -> bool:
         return (
             "Changeling" in self.keywords
-            or self.name == "Mistform Ultimus"
+            or f"{self.name} is every creature type" in self.text
             or self.subtypes >= self.all_creature_types
         )
 
