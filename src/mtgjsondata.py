@@ -52,16 +52,16 @@ def atomic_card_filter(obj, _):
     if obj["layout"] == "emblem":
         return False
 
-    bad_sets = [
-        "THP1",
-        "THP2",
-        "THP3",
-        "PSAL",
-        "TDAG",
-        "TBTH",
-        "TFTH",
-        "TUND",
-    ]
+    # bad_sets = [
+    #     "THP1",
+    #     "THP2",
+    #     "THP3",
+    #     "PSAL",
+    #     "TDAG",
+    #     "TBTH",
+    #     "TFTH",
+    #     "TUND",
+    # ]
 
     # if obj["setCode"] in (
     #     "THP1",
@@ -85,12 +85,22 @@ def atomic_card_filter(obj, _):
 
 
 class MtgjsonData:
-    def get_card_by_name(self, name: str):
+    def get_card_by_name(self, name: str, set_code: Optional[str] = None):
         cards = self.load_cards(filterfunc=legal_card_filter)
-        card = next(
-            (c for c in cards if c.name == name or c.face_name == name),
-            None,
-        )
+        if set_code:
+            card = next(
+                (
+                    c
+                    for c in cards
+                    if name in (c.name, c.face_name) and (c.set_code == set_code)
+                ),
+                None,
+            )
+        else:
+            card = next(
+                (c for c in cards if name in (c.name, c.face_name)),
+                None,
+            )
         assert card is not None
         return card
 

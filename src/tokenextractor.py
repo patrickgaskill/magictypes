@@ -1,110 +1,111 @@
 from collections import defaultdict
+from dataclasses import asdict
 from pathlib import Path
 
 import regex
 from lark import Lark, Token, Tree
 
-from magicobjects import MagicObject, MagicToken
+from magicobjects import MagicCard, MagicToken
 
 
 class TokenExtractor:
     overrides: dict[str, list[MagicToken]] = {
         "Master of the Wild Hunt Avatar": [
-            MagicToken(
-                colors=["G"],
-                types=["Creature"],
-                subtypes=["Wolf"],
-                power="2",
-                toughness="2",
-            ),
-            MagicToken(
-                colors=["G"],
-                types=["Creature"],
-                subtypes=["Antelope"],
-                power="2",
-                toughness="3",
-                keywords=["forestwalk"],
-            ),
-            MagicToken(
-                colors=["G"],
-                types=["Creature"],
-                subtypes=["Cat"],
-                power="3",
-                toughness="2",
-                keywords=["shroud"],
-            ),
-            MagicToken(
-                colors=["G"],
-                types=["Creature"],
-                subtypes=["Rhino"],
-                power="4",
-                toughness="4",
-                keywords=["trample"],
-            ),
+            {
+                "colors": ["G"],
+                "types": ["Creature"],
+                "subtypes": ["Wolf"],
+                "power": "2",
+                "toughness": "2",
+            },
+            {
+                "colors": ["G"],
+                "types": ["Creature"],
+                "subtypes": ["Antelope"],
+                "power": "2",
+                "toughness": "3",
+                "keywords": ["forestwalk"],
+            },
+            {
+                "colors": ["G"],
+                "types": ["Creature"],
+                "subtypes": ["Cat"],
+                "power": "3",
+                "toughness": "2",
+                "keywords": ["shroud"],
+            },
+            {
+                "colors": ["G"],
+                "types": ["Creature"],
+                "subtypes": ["Rhino"],
+                "power": "4",
+                "toughness": "4",
+                "keywords": ["trample"],
+            },
         ],
         "Sarpadian Empires, Vol. VII": [
-            MagicToken(
-                colors=["W"],
-                types=["Creature"],
-                subtypes=["Citizen"],
-                power="1",
-                toughness="1",
-            ),
-            MagicToken(
-                colors=["U"],
-                types=["Creature"],
-                subtypes=["Camarid"],
-                power="1",
-                toughness="1",
-            ),
-            MagicToken(
-                colors=["B"],
-                types=["Creature"],
-                subtypes=["Thrull"],
-                power="1",
-                toughness="1",
-            ),
-            MagicToken(
-                colors=["R"],
-                types=["Creature"],
-                subtypes=["Goblin"],
-                power="1",
-                toughness="1",
-            ),
-            MagicToken(
-                colors=["G"],
-                types=["Creature"],
-                subtypes=["Saproling"],
-                power="1",
-                toughness="1",
-            ),
+            {
+                "colors": ["W"],
+                "types": ["Creature"],
+                "subtypes": ["Citizen"],
+                "power": "1",
+                "toughness": "1",
+            },
+            {
+                "colors": ["U"],
+                "types": ["Creature"],
+                "subtypes": ["Camarid"],
+                "power": "1",
+                "toughness": "1",
+            },
+            {
+                "colors": ["B"],
+                "types": ["Creature"],
+                "subtypes": ["Thrull"],
+                "power": "1",
+                "toughness": "1",
+            },
+            {
+                "colors": ["R"],
+                "types": ["Creature"],
+                "subtypes": ["Goblin"],
+                "power": "1",
+                "toughness": "1",
+            },
+            {
+                "colors": ["G"],
+                "types": ["Creature"],
+                "subtypes": ["Saproling"],
+                "power": "1",
+                "toughness": "1",
+            },
         ],
         "Outlaws' Merriment": [
-            MagicToken(
-                colors=["R", "W"],
-                types=["Creature"],
-                subtypes=["Human", "Warrior"],
-                power="3",
-                toughness="1",
-                keywords=["trample", "haste"],
-            ),
-            MagicToken(
-                colors=["R", "W"],
-                types=["Creature"],
-                subtypes=["Human", "Cleric"],
-                power="2",
-                toughness="1",
-                keywords=["lifelink", "haste"],
-            ),
-            MagicToken(
-                colors=["R", "W"],
-                types=["Creature"],
-                subtypes=["Human", "Rogue"],
-                power="1",
-                toughness="2",
-                keywords=["haste"],
-                text="When this creature enters the battlefield, it deals 1 damage to any target.",
-            ),
+            {
+                "colors": ["W", "R"],
+                "types": ["Creature"],
+                "subtypes": ["Human", "Warrior"],
+                "power": "3",
+                "toughness": "1",
+                "keywords": ["trample", "haste"],
+            },
+            {
+                "colors": ["W", "R"],
+                "types": ["Creature"],
+                "subtypes": ["Human", "Cleric"],
+                "power": "2",
+                "toughness": "1",
+                "keywords": ["lifelink", "haste"],
+            },
+            {
+                "colors": ["W", "R"],
+                "types": ["Creature"],
+                "subtypes": ["Human", "Rogue"],
+                "power": "1",
+                "toughness": "2",
+                "keywords": ["haste"],
+                "text": "When this creature enters the battlefield, it deals 1 damage to any target.",
+            },
         ],
     }
 
@@ -120,6 +121,7 @@ class TokenExtractor:
 
     def __init__(self, debug=False):
         self.debug = debug
+        self._cache = {}
         with Path(__file__).with_name("grammar.lark").open("r") as f:
             self.parser = Lark(
                 f.read(), regex=True, parser="earley", ambiguity="resolve"
@@ -159,16 +161,22 @@ class TokenExtractor:
 
         return tokens
 
-    def extract_from_card(self, card: MagicObject) -> list[MagicToken]:
-        tokens = (
-            TokenExtractor.overrides[card.name]
-            if card.name in TokenExtractor.overrides
-            else self.extract_from_text(card.text)
-        )
+    def extract_from_card(self, card: MagicCard) -> list[MagicToken]:
+        if card.name in TokenExtractor.overrides:
+            return [
+                MagicToken(**t, creator=card)
+                for t in TokenExtractor.overrides[card.name]
+            ]
 
-        for token in tokens:
-            token.creator = card
+        if card.name in self._cache:
+            return [
+                MagicToken(**{**t, "creator": card}) for t in self._cache[card.name]
+            ]
 
+        tokens = self.extract_from_text(card.text)
+        self._cache[card.name] = [t.asdict() for t in tokens]
+        for t in tokens:
+            t.creator = card
         return tokens
 
     def get_tokens_from_tree(self, tree):

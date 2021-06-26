@@ -4,6 +4,18 @@ from magicobjects import MagicToken
 
 
 @pytest.mark.parametrize(
+    "name_a,set_code_a,name_b,set_code_b",
+    [("The Hive", "LEA", "The Hive", "10E")],
+)
+def test_sort_key(mtgjsondata, name_a, set_code_a, name_b, set_code_b):
+    card_a = mtgjsondata.get_card_by_name(name_a, set_code_a)
+    card_b = mtgjsondata.get_card_by_name(name_b, set_code_b)
+    print(f"A) {name_a} sort_key: {card_a.sort_key}")
+    print(f"B) {name_b} sort_key: {card_b.sort_key}")
+    assert card_a.sort_key < card_b.sort_key
+
+
+@pytest.mark.parametrize(
     "name,expected",
     [
         ("Mistform Ultimus", True),
@@ -128,4 +140,5 @@ def test_type_key(mtgjsondata, name, expected):
     ],
 )
 def test_predefined_tokens(token, expected):
+    assert token.is_token
     assert token == expected

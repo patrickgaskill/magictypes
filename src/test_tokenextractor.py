@@ -4,6 +4,19 @@ from magicobjects import MagicToken
 
 test_cases = [
     (
+        "The Hive",
+        [
+            MagicToken(
+                name="Wasp",
+                types=["Artifact", "Creature"],
+                subtypes=["Insect"],
+                power="1",
+                toughness="1",
+                keywords=["flying"],
+            )
+        ],
+    ),
+    (
         "Master of the Wild Hunt Avatar",
         [
             MagicToken(

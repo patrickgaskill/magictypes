@@ -6,18 +6,17 @@ from magicobjects import MagicObject, TypeKey
 
 
 class Store:
-    def __init__(self, name: str):
+    def __init__(self, name: str, effects: Optional[Callable] = None):
         self.store: dict[TypeKey, MagicObject] = {}
-        self.name: str = name
+        self.name = name
+        self.effects = effects
 
-    def evaluate(
-        self, card: MagicObject, apply_effects: Optional[Callable] = None
-    ) -> bool:
-        if callable(apply_effects):
-            for affected_card in apply_effects(card):
-                self.evaluate(affected_card)
+    def evaluate(self, obj: MagicObject, apply_effects: bool = True) -> bool:
+        if apply_effects and callable(self.effects):
+            for affected_card in self.effects(obj):
+                self.evaluate(affected_card, False)
 
-        self.store[card.type_key] = True
+        self.store[obj.type_key] = True
 
         return False
 
@@ -27,13 +26,22 @@ class Store:
             writer = csv.writer(csvfile)
             rows = [
                 (
-                    card.type_str,
-                    card.name,
-                    card.set_code,
-                    card.number,
-                    card.release_date,
+                    obj.type_str,
+                    obj.name,
+                    obj.creator.name,
+                    obj.creator.set_code,
+                    obj.creator.number,
+                    obj.creator.release_date,
                 )
-                for card in sorted(self.store.values(), key=lambda card: card.sort_key)
+                if obj.is_token
+                else (
+                    obj.type_str,
+                    obj.name,
+                    obj.set_code,
+                    obj.number,
+                    obj.release_date,
+                )
+                for obj in sorted(self.store.values(), key=lambda obj: obj.sort_key)
             ]
             writer.writerows(rows)
         return csv_path
@@ -50,42 +58,38 @@ class Store:
 
 
 class UniqueStore(Store):
-    def evaluate(
-        self, card: MagicObject, apply_effects: Optional[Callable] = None
-    ) -> bool:
-        if callable(apply_effects):
-            for affected_card in apply_effects(card):
-                self.evaluate(affected_card)
+    def evaluate(self, obj: MagicObject, apply_effects: bool = True) -> bool:
+        if apply_effects and callable(self.effects):
+            for affected_card in self.effects(obj):
+                self.evaluate(affected_card, False)
 
         if (
-            card.type_key not in self.store
-            or card.sort_key < self.store[card.type_key].sort_key
+            obj.type_key not in self.store
+            or obj.sort_key < self.store[obj.type_key].sort_key
         ):
-            self.store[card.type_key] = card
+            self.store[obj.type_key] = obj
             return True
 
         return False
 
 
 class MaximalStore(Store):
-    def __init__(self, name: str):
-        super().__init__(name)
+    def __init__(self, name: str, effects: Optional[Callable] = None):
+        super().__init__(name, effects)
         self.eliminated_keys: dict[TypeKey, MagicObject] = {}
 
-    def evaluate(
-        self, card: MagicObject, apply_effects: Optional[Callable] = None
-    ) -> bool:
-        if callable(apply_effects):
-            for affected_card in apply_effects(card):
-                self.evaluate(affected_card)
+    def evaluate(self, obj: MagicObject, apply_effects: bool = True) -> bool:
+        if apply_effects and callable(self.effects):
+            for affected_card in self.effects(obj):
+                self.evaluate(affected_card, False)
 
-        if card.type_key in self.eliminated_keys:
+        if obj.type_key in self.eliminated_keys:
             return False
 
         # If the type already exists, replace it only if this card is older
-        if card.type_key in self.store:
-            if card.sort_key < self.store[card.type_key].sort_key:
-                self.store[card.type_key] = card
+        if obj.type_key in self.store:
+            if obj.sort_key < self.store[obj.type_key].sort_key:
+                self.store[obj.type_key] = obj
                 return True
             return False
 
@@ -93,15 +97,15 @@ class MaximalStore(Store):
         # If any saved keys are a subset to this card, delete those keys
         keys_to_delete = []
         for other_key, other in self.store.items():
-            if card.is_type_subset(other):
+            if obj.is_type_subset(other):
                 return False
 
-            if other.is_type_subset(card):
+            if other.is_type_subset(obj):
                 keys_to_delete.append(other_key)
 
         for key in keys_to_delete:
             self.eliminated_keys[key] = True
             del self.store[key]
 
-        self.store[card.type_key] = card
+        self.store[obj.type_key] = obj
         return True

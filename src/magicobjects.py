@@ -235,26 +235,56 @@ class MagicCard(MagicObject):
 class MagicToken(MagicObject):
     object_type: ClassVar[str] = "token"
     name: str = None
-    creator: Optional[MagicObject] = None
+    creator: Optional[MagicObject] = field(compare=False, default=None)
 
     def __post_init__(self):
         super().__post_init__()
         if not self.name:
-            self.name = " ".join(self.subtypes)
+            self.name = " ".join(self.sorted_subtypes)
 
     @property
     def release_date(self) -> str:
         if self.creator:
             return self.creator.release_date
 
-        return super().release_date
+        raise AttributeError("This instance of MagicToken does not have a creator set")
 
     @cached_property
     def sort_key(self) -> tuple[datetime, str, int, str]:
         if self.creator:
             return self.creator.sort_key
 
-        return super().sort_key
+        raise AttributeError("This instance of MagicToken does not have a creator set")
+
+    def __copy__(self):
+        return self.copy()
+
+    def copy(self) -> "MagicToken":
+        return MagicToken(
+            name=self.name,
+            colors=self.colors.copy(),
+            types=self.types.copy(),
+            subtypes=self.sorted_subtypes,
+            supertypes=self.supertypes.copy(),
+            keywords=self.keywords.copy(),
+            text=self.text,
+            power=self.power,
+            toughness=self.toughness,
+            creator=self.creator.copy(),
+        )
+
+    def asdict(self):
+        return {
+            "name": self.name,
+            "colors": self.colors.copy(),
+            "types": self.types.copy(),
+            "subtypes": self.sorted_subtypes,
+            "supertypes": self.supertypes.copy(),
+            "keywords": self.keywords.copy(),
+            "text": self.text,
+            "power": self.power,
+            "toughness": self.toughness,
+        }
 
     @classmethod
     @property
