@@ -160,9 +160,16 @@ class TokenExtractor:
         return tokens
 
     def extract_from_card(self, card: MagicObject) -> list[MagicToken]:
-        if card.name in TokenExtractor.overrides:
-            return TokenExtractor.overrides[card.name]
-        return self.extract_from_text(card.text)
+        tokens = (
+            TokenExtractor.overrides[card.name]
+            if card.name in TokenExtractor.overrides
+            else self.extract_from_text(card.text)
+        )
+
+        for token in tokens:
+            token.creator = card
+
+        return tokens
 
     def get_tokens_from_tree(self, tree):
         tokens = []

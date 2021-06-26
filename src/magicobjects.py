@@ -45,11 +45,12 @@ class MagicObject:
     }
     name: str
     text: Optional[str] = None
+    power: Optional[str] = None
+    toughness: Optional[str] = None
     colors: set[Color] = field(default_factory=set)
     types: set[CardType] = field(default_factory=set)
     subtypes: set[Subtype] = field(default_factory=set)
     supertypes: set[Supertype] = field(default_factory=set)
-
     keywords: set[Keyword] = field(default_factory=set)
     subtype_order: dict[Subtype, int] = field(
         init=False, repr=False, default_factory=dict
@@ -64,18 +65,17 @@ class MagicObject:
         self.subtypes = set(self.subtypes)
         self.supertypes = set(self.supertypes)
         self.keywords = set(self.keywords)
-        self.availability = set(self.availability)
 
     @property
     def release_date(self) -> str:
-        pass
+        raise NotImplementedError("Generic Magic objects do not have a release date.")
 
     @cached_property
     def is_every_creature_type(self) -> bool:
         return (
             "Changeling" in self.keywords
             or (self.text and f"{self.name} is every creature type" in self.text)
-            or self.subtypes >= self.all_creature_types
+            or self.subtypes >= MagicObject.all_creature_types
         )
 
     @property
@@ -91,7 +91,7 @@ class MagicObject:
 
     @cached_property
     def expanded_subtypes(self) -> set[Subtype]:
-        if self.subtypes >= self.all_creature_types:
+        if self.subtypes >= MagicObject.all_creature_types:
             return self.subtypes
 
         return (
@@ -129,7 +129,7 @@ class MagicObject:
             notes.append("(all basic land types)")
 
         if self.is_every_creature_type:
-            subtypes -= self.all_creature_types
+            subtypes -= MagicObject.all_creature_types
             notes.append("(all creature types)")
 
         notes_and_subtypes = (
@@ -155,7 +155,7 @@ class MagicObject:
 
     @cached_property
     def sort_key(self) -> tuple[datetime, str, int, str]:
-        pass
+        raise NotImplementedError("Generic Magic objects do not have a sort key.")
 
     def is_type_subset(self, other: "MagicObject") -> bool:
         return self.types.union(
@@ -190,10 +190,10 @@ class MagicCard(MagicObject):
     set_type: Optional[str] = None
     original_release_date: Optional[str] = None
     availability: set[str] = field(default_factory=set)
-    colors: set[Color] = field(default_factory=set)
-    types: set[CardType] = field(default_factory=set)
-    subtypes: set[Subtype] = field(default_factory=set)
-    supertypes: set[Supertype] = field(default_factory=set)
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.availability = set(self.availability)
 
     @property
     def release_date(self) -> str:
@@ -232,34 +232,29 @@ class MagicCard(MagicObject):
 
 
 @dataclass
-class MagicToken:
+class MagicToken(MagicObject):
     object_type: ClassVar[str] = "token"
     name: str = None
-    colors: set[Color] = field(default_factory=set)
-    types: set[CardType] = field(default_factory=set)
-    subtypes: set[Subtype] = field(default_factory=set)
-    supertypes: set[Supertype] = field(default_factory=set)
-    power: Optional[str] = None
-    toughness: Optional[str] = None
-    text: Optional[str] = None
-    colors: set[Color] = field(default_factory=set)
-    keywords: set[Keyword] = field(default_factory=set)
-    subtype_order: dict[Subtype, int] = field(
-        init=False, repr=False, default_factory=dict
-    )
+    creator: Optional[MagicObject] = None
 
     def __post_init__(self):
+        super().__post_init__()
         if not self.name:
             self.name = " ".join(self.subtypes)
 
-        if isinstance(self.subtypes, Sequence):
-            self.subtype_order = {s: i for i, s in enumerate(self.subtypes)}
+    @property
+    def release_date(self) -> str:
+        if self.creator:
+            return self.creator.release_date
 
-        self.colors = set(self.colors)
-        self.types = set(self.types)
-        self.subtypes = set(self.subtypes)
-        self.supertypes = set(self.supertypes)
-        self.keywords = set(self.keywords)
+        return super().release_date
+
+    @cached_property
+    def sort_key(self) -> tuple[datetime, str, int, str]:
+        if self.creator:
+            return self.creator.sort_key
+
+        return super().sort_key
 
     @classmethod
     @property

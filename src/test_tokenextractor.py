@@ -1385,6 +1385,8 @@ test_cases = [
 @pytest.mark.parametrize("name,expected", test_cases)
 def test_tokens(mtgjsondata, extractor, name, expected):
     card = mtgjsondata.get_card_by_name(name)
+    for token in expected:
+        token.creator = card
     print(card.text)
     tokens = extractor.extract_from_card(card)
     assert tokens == expected
