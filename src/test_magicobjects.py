@@ -82,6 +82,38 @@ def test_type_key(mtgjsondata, name, expected):
             ),
         ),
         (
+            MagicToken.Clue,
+            MagicToken(
+                types=["Artifact"],
+                subtypes=["Clue"],
+                text="{2}, Sacrifice this artifact: Draw a card.",
+            ),
+        ),
+        (
+            MagicToken.Treasure,
+            MagicToken(
+                types=["Artifact"],
+                subtypes=["Treasure"],
+                text="{T}, Sacrifice this artifact: Add one mana of any color.",
+            ),
+        ),
+        (
+            MagicToken.Food,
+            MagicToken(
+                types=["Artifact"],
+                subtypes=["Food"],
+                text="{2}, {T}, Sacrifice this artifact: You gain 3 life.",
+            ),
+        ),
+        (
+            MagicToken.Shard,
+            MagicToken(
+                types=["Enchantment"],
+                subtypes=["Shard"],
+                text="{2}, Sacrifice this enchantment: Scry 1, then draw a card.",
+            ),
+        ),
+        (
             MagicToken.Walker,
             MagicToken(
                 name="Walker",

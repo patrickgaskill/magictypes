@@ -232,45 +232,59 @@ class MagicToken:
         self.supertypes = set(self.supertypes)
         self.keywords = set(self.keywords)
 
-    def __getattr__(self, _):
-        """Added so pylint doesn't complain about dynamic properties."""
+    @classmethod
+    @property
+    def Gold(cls):
+        return cls(
+            types=["Artifact"],
+            subtypes=["Gold"],
+            text="Sacrifice this artifact: Add one mana of any color.",
+        )
 
+    @classmethod
+    @property
+    def Clue(cls):
+        return cls(
+            types=["Artifact"],
+            subtypes=["Clue"],
+            text="{2}, Sacrifice this artifact: Draw a card.",
+        )
 
-predefined_tokens = {
-    "Gold": {
-        "types": ["Artifact"],
-        "subtypes": ["Gold"],
-        "text": "Sacrifice this artifact: Add one mana of any color.",
-    },
-    "Clue": {
-        "types": ["Artifact"],
-        "subtypes": ["Gold"],
-        "text": "{2}, Sacrifice this artifact: Draw a card.",
-    },
-    "Treasure": {
-        "types": ["Artifact"],
-        "subtypes": ["Treasure"],
-        "text": "{T}, Sacrifice this artifact: Add one mana of any color.",
-    },
-    "Food": {
-        "types": ["Artifact"],
-        "subtypes": ["Food"],
-        "text": "{2}, {T}, Sacrifice this artifact: You gain 3 life.",
-    },
-    "Shard": {
-        "types": ["Enchantment"],
-        "subtypes": ["Shard"],
-        "text": "{2}, Sacrifice this enchantment: Scry 1, then draw a card.",
-    },
-    "Walker": {
-        "name": "Walker",
-        "colors": ["B"],
-        "types": ["Creature"],
-        "subtypes": ["Zombie"],
-        "power": "2",
-        "toughness": "2",
-    },
-}
+    @classmethod
+    @property
+    def Treasure(cls):
+        return cls(
+            types=["Artifact"],
+            subtypes=["Treasure"],
+            text="{T}, Sacrifice this artifact: Add one mana of any color.",
+        )
 
-for name, attrs in predefined_tokens.items():
-    setattr(MagicToken, name, MagicToken(**attrs))
+    @classmethod
+    @property
+    def Food(cls):
+        return cls(
+            types=["Artifact"],
+            subtypes=["Food"],
+            text="{2}, {T}, Sacrifice this artifact: You gain 3 life.",
+        )
+
+    @classmethod
+    @property
+    def Shard(cls):
+        return cls(
+            types=["Enchantment"],
+            subtypes=["Shard"],
+            text="{2}, Sacrifice this enchantment: Scry 1, then draw a card.",
+        )
+
+    @classmethod
+    @property
+    def Walker(cls):
+        return cls(
+            name="Walker",
+            colors=["B"],
+            types=["Creature"],
+            subtypes=["Zombie"],
+            power="2",
+            toughness="2",
+        )
