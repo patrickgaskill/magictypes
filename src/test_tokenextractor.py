@@ -4,6 +4,19 @@ from magicobjects import MagicToken
 
 test_cases = [
     (
+        "Maskwood Nexus",
+        [
+            MagicToken(
+                colors=["U"],
+                types=["Creature"],
+                subtypes=["Shapeshifter"],
+                power="2",
+                toughness="2",
+                keywords=["Changeling"],
+            )
+        ],
+    ),
+    (
         "The Hive",
         [
             MagicToken(
@@ -12,7 +25,7 @@ test_cases = [
                 subtypes=["Insect"],
                 power="1",
                 toughness="1",
-                keywords=["flying"],
+                keywords=["Flying"],
             )
         ],
     ),
@@ -32,7 +45,7 @@ test_cases = [
                 subtypes=["Antelope"],
                 power="2",
                 toughness="3",
-                keywords=["forestwalk"],
+                keywords=["Forestwalk"],
             ),
             MagicToken(
                 colors=["G"],
@@ -40,7 +53,7 @@ test_cases = [
                 subtypes=["Cat"],
                 power="3",
                 toughness="2",
-                keywords=["shroud"],
+                keywords=["Shroud"],
             ),
             MagicToken(
                 colors=["G"],
@@ -48,7 +61,7 @@ test_cases = [
                 subtypes=["Rhino"],
                 power="4",
                 toughness="4",
-                keywords=["trample"],
+                keywords=["Trample"],
             ),
         ],
     ),
@@ -63,7 +76,7 @@ test_cases = [
                 subtypes=["Dragon"],
                 power="4",
                 toughness="4",
-                keywords=["flying"],
+                keywords=["Flying"],
             )
         ],
     ),
@@ -91,7 +104,7 @@ test_cases = [
                 subtypes=["Demon", "Spirit"],
                 power="5",
                 toughness="5",
-                keywords=["flying"],
+                keywords=["Flying"],
             )
         ],
     ),
@@ -184,7 +197,7 @@ test_cases = [
                 subtypes=["Knight"],
                 power="2",
                 toughness="2",
-                keywords=["vigilance"],
+                keywords=["Vigilance"],
             )
         ],
     ),
@@ -197,7 +210,7 @@ test_cases = [
                 subtypes=["Knight"],
                 power="2",
                 toughness="2",
-                keywords=["vigilance"],
+                keywords=["Vigilance"],
             )
         ],
     ),
@@ -236,7 +249,7 @@ test_cases = [
                 subtypes=["Bird"],
                 power="1",
                 toughness="1",
-                keywords=["flying"],
+                keywords=["Flying"],
             ),
         ],
     ),
@@ -261,7 +274,7 @@ test_cases = [
                 subtypes=["Troll", "Warrior"],
                 power="4",
                 toughness="4",
-                keywords=["trample"],
+                keywords=["Trample"],
             )
         ],
     ),
@@ -319,7 +332,7 @@ test_cases = [
                 subtypes=["Equipment"],
                 name="Rock",
                 text="Equipped creature has '{1}, {T}, Sacrifice Rock: This creature deals 2 damage to any target'",
-                keywords=["equip {1}"],
+                keywords=["Equip {1}"],
             )
         ],
     ),
@@ -332,7 +345,7 @@ test_cases = [
                 subtypes=["Human", "Warrior"],
                 power="3",
                 toughness="1",
-                keywords=["trample", "haste"],
+                keywords=["Trample", "Haste"],
             ),
             MagicToken(
                 colors=["R", "W"],
@@ -340,7 +353,7 @@ test_cases = [
                 subtypes=["Human", "Cleric"],
                 power="2",
                 toughness="1",
-                keywords=["lifelink", "haste"],
+                keywords=["Lifelink", "Haste"],
             ),
             MagicToken(
                 colors=["R", "W"],
@@ -348,7 +361,7 @@ test_cases = [
                 subtypes=["Human", "Rogue"],
                 power="1",
                 toughness="2",
-                keywords=["haste"],
+                keywords=["Haste"],
                 text="When this creature enters the battlefield, it deals 1 damage to any target.",
             ),
         ],
@@ -396,7 +409,7 @@ test_cases = [
                 subtypes=["Inkling"],
                 power="2",
                 toughness="1",
-                keywords=["flying"],
+                keywords=["Flying"],
             )
         ],
     ),
@@ -422,7 +435,7 @@ test_cases = [
                 subtypes=["Angel"],
                 power="4",
                 toughness="4",
-                keywords=["flying"],
+                keywords=["Flying"],
             )
         ],
     ),
@@ -491,7 +504,7 @@ test_cases = [
                 subtypes=["Harpy"],
                 power="1",
                 toughness="1",
-                keywords=["flying"],
+                keywords=["Flying"],
             )
         ],
     ),
@@ -516,7 +529,7 @@ test_cases = [
                 subtypes=["Spirit"],
                 power="1",
                 toughness="1",
-                keywords=["flying"],
+                keywords=["Flying"],
             )
         ],
     ),
@@ -554,7 +567,7 @@ test_cases = [
                 subtypes=["Wurm"],
                 power="5",
                 toughness="5",
-                keywords=["trample"],
+                keywords=["Trample"],
             )
         ],
     ),
@@ -580,7 +593,7 @@ test_cases = [
                 subtypes=["Bird"],
                 power="2",
                 toughness="2",
-                keywords=["flying"],
+                keywords=["Flying"],
             )
         ],
     ),
@@ -617,7 +630,7 @@ test_cases = [
                 subtypes=["Cat"],
                 power="1",
                 toughness="1",
-                keywords=["lifelink"],
+                keywords=["Lifelink"],
             )
         ],
     ),
@@ -666,7 +679,7 @@ test_cases = [
                 colors=["W"],
                 types=["Enchantment"],
                 subtypes=["Aura"],
-                keywords=["enchant permanent", "totem armor"],
+                keywords=["Enchant permanent", "Totem armor"],
             )
         ],
     ),
@@ -679,7 +692,7 @@ test_cases = [
                 subtypes=["Elemental"],
                 power="3",
                 toughness="1",
-                keywords=["trample", "haste"],
+                keywords=["Trample", "Haste"],
             )
         ],
     ),
@@ -718,7 +731,7 @@ test_cases = [
                 subtypes=["Avatar"],
                 power="20",
                 toughness="20",
-                keywords=["flying", "indestructible"],
+                keywords=["Flying", "Indestructible"],
             )
         ],
     ),
@@ -733,7 +746,7 @@ test_cases = [
                 subtypes=["Cat"],
                 power="4",
                 toughness="1",
-                keywords=["trample"],
+                keywords=["Trample"],
             )
         ],
     ),
@@ -747,7 +760,7 @@ test_cases = [
                 subtypes=["Avatar"],
                 power="3",
                 toughness="6",
-                keywords=["haste"],
+                keywords=["Haste"],
                 text="Whenever this creature attacks, it deals 3 damage to each opponent.",
             )
         ],
@@ -789,7 +802,7 @@ test_cases = [
                 subtypes=["Faerie"],
                 power="1",
                 toughness="1",
-                keywords=["flying"],
+                keywords=["Flying"],
                 text="Cloud Sprite can block only creatures with flying.",
             )
         ],
@@ -803,7 +816,7 @@ test_cases = [
                 subtypes=["Angel"],
                 power="4",
                 toughness="4",
-                keywords=["flying"],
+                keywords=["Flying"],
             ),
             MagicToken(
                 colors=["W"],
@@ -864,7 +877,7 @@ test_cases = [
                 subtypes=["Spirit"],
                 power="1",
                 toughness="1",
-                keywords=["flying"],
+                keywords=["Flying"],
             ),
             MagicToken(
                 colors=["W"],
@@ -872,7 +885,7 @@ test_cases = [
                 subtypes=["Angel"],
                 power="4",
                 toughness="4",
-                keywords=["flying"],
+                keywords=["Flying"],
             ),
         ],
     ),
@@ -951,7 +964,7 @@ test_cases = [
                 colors=["G"],
                 types=["Creature"],
                 subtypes=["Wall"],
-                keywords=["defender"],
+                keywords=["Defender"],
                 power="0",
                 toughness="1",
             )
@@ -1019,7 +1032,7 @@ test_cases = [
                 subtypes=["Avatar"],
                 power="20",
                 toughness="20",
-                keywords=["flying", "indestructible"],
+                keywords=["Flying", "Indestructible"],
             )
         ],
     ),
@@ -1062,7 +1075,7 @@ test_cases = [
                 name="Stoneforged Blade",
                 types=["Artifact"],
                 subtypes=["Equipment"],
-                keywords=["indestructible", "equip {0}"],
+                keywords=["Indestructible", "Equip {0}"],
                 text="Equipped creature gets +5/+5 and has double strike.",
             ),
         ],
@@ -1089,7 +1102,7 @@ test_cases = [
                 subtypes=["Beast"],
                 power="4",
                 toughness="4",
-                keywords=["trample"],
+                keywords=["Trample"],
             )
         ],
     ),
@@ -1158,7 +1171,7 @@ test_cases = [
                 subtypes=["Cat", "Dragon"],
                 power="3",
                 toughness="3",
-                keywords=["flying"],
+                keywords=["Flying"],
             )
         ],
     ),
@@ -1175,7 +1188,7 @@ test_cases = [
                 subtypes=["Bird"],
                 power="4",
                 toughness="4",
-                keywords=["flying"],
+                keywords=["Flying"],
             )
         ],
     ),
@@ -1187,7 +1200,7 @@ test_cases = [
                 subtypes=["Tetravite"],
                 power="1",
                 toughness="1",
-                keywords=["flying"],
+                keywords=["Flying"],
                 text="This creature can't be enchanted.",
             )
         ],
@@ -1202,7 +1215,7 @@ test_cases = [
                 subtypes=["Orb"],
                 power="X",
                 toughness="X",
-                keywords=["flying"],
+                keywords=["Flying"],
             )
         ],
     ),
@@ -1216,7 +1229,7 @@ test_cases = [
                 subtypes=["Insect"],
                 power="1",
                 toughness="1",
-                keywords=["flying"],
+                keywords=["Flying"],
             )
         ],
     ),
@@ -1300,7 +1313,7 @@ test_cases = [
                 subtypes=["Spider"],
                 power="2",
                 toughness="1",
-                keywords=["menace", "reach"],
+                keywords=["Menace", "Reach"],
             )
         ],
     ),
@@ -1324,7 +1337,7 @@ test_cases = [
                 subtypes=["Centaur"],
                 power="3",
                 toughness="3",
-                keywords=["protection from black"],
+                keywords=["Protection from black"],
             )
         ],
     ),
@@ -1337,7 +1350,7 @@ test_cases = [
                 subtypes=["Knight"],
                 power="2",
                 toughness="2",
-                keywords=["first strike"],
+                keywords=["First strike"],
             )
         ],
     ),

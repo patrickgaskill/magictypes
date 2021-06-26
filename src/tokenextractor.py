@@ -24,7 +24,7 @@ class TokenExtractor:
                 "subtypes": ["Antelope"],
                 "power": "2",
                 "toughness": "3",
-                "keywords": ["forestwalk"],
+                "keywords": ["Forestwalk"],
             },
             {
                 "colors": ["G"],
@@ -32,7 +32,7 @@ class TokenExtractor:
                 "subtypes": ["Cat"],
                 "power": "3",
                 "toughness": "2",
-                "keywords": ["shroud"],
+                "keywords": ["Shroud"],
             },
             {
                 "colors": ["G"],
@@ -40,7 +40,7 @@ class TokenExtractor:
                 "subtypes": ["Rhino"],
                 "power": "4",
                 "toughness": "4",
-                "keywords": ["trample"],
+                "keywords": ["Trample"],
             },
         ],
         "Sarpadian Empires, Vol. VII": [
@@ -87,7 +87,7 @@ class TokenExtractor:
                 "subtypes": ["Human", "Warrior"],
                 "power": "3",
                 "toughness": "1",
-                "keywords": ["trample", "haste"],
+                "keywords": ["Trample", "Haste"],
             },
             {
                 "colors": ["W", "R"],
@@ -95,7 +95,7 @@ class TokenExtractor:
                 "subtypes": ["Human", "Cleric"],
                 "power": "2",
                 "toughness": "1",
-                "keywords": ["lifelink", "haste"],
+                "keywords": ["Lifelink", "Haste"],
             },
             {
                 "colors": ["W", "R"],
@@ -103,7 +103,7 @@ class TokenExtractor:
                 "subtypes": ["Human", "Rogue"],
                 "power": "1",
                 "toughness": "2",
-                "keywords": ["haste"],
+                "keywords": ["Haste"],
                 "text": "When this creature enters the battlefield, it deals 1 damage to any target.",
             },
         ],
@@ -202,7 +202,10 @@ class TokenExtractor:
                         elif t.type == "TOUGHNESS":
                             characteristics["toughness"] = str(t)
                         elif t.type == "KEYWORD":
-                            characteristics["keywords"].append(str(t))
+                            keyword = str(t)
+                            characteristics["keywords"].append(
+                                keyword[0].upper() + keyword[1:]
+                            )
                         elif t.type == "RULES_TEXT" or t.type == "INNER_RULES_TEXT":
                             # Replace a trailing comma with a period and uppercase the first letter
                             text = regex.sub(r",$", r".", str(t))
