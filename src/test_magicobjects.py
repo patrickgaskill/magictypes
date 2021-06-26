@@ -12,6 +12,7 @@ from magicobjects import MagicToken
         ("Crib Swap", True),
         ("Amoeboid Changeling", True),
         ("Moritte of the Frost", True),
+        ("Aegis Turtle", False),
     ],
 )
 def test_is_every_creature_type(mtgjsondata, name, expected):
