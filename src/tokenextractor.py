@@ -7,10 +7,6 @@ from lark import Lark, Token, Tree
 from magicobjects import MagicObject, MagicToken
 
 
-# Potential overrides:
-# Outlaw's Merriment
-# Sarpadian Empires
-# Master of the Wild Hunt avatar
 class TokenExtractor:
     overrides: dict[str, list[MagicToken]] = {
         "Master of the Wild Hunt Avatar": [
@@ -209,7 +205,3 @@ class TokenExtractor:
                 tokens.append(MagicToken(**characteristics))
 
         return tokens
-
-
-if __name__ == "__main__":
-    pass
