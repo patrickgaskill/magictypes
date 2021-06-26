@@ -3,6 +3,7 @@ import pytest
 from magicobjects import MagicToken
 
 test_cases = [
+    ("Carth the Lion", []),
     (
         "Ulvenwald Mysteries",
         [
