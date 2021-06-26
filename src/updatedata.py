@@ -38,7 +38,7 @@ def fetch_mtgjson() -> None:
             file_path = mtgjson_path / f"{filename}.json"
             progress.console.print(f"MTGJSON {filename} downloaded to {file_path}")
             progress.advance(task)
-        progress.console.print("✅ [bold green]MTGJSON data updated!")
+        progress.console.print("[bold green]✓ MTGJSON data updated!")
 
 
 def fetch_scryfall() -> None:
@@ -61,7 +61,7 @@ def fetch_scryfall() -> None:
                 f"Scryfall {bulk_data_item['name']} downloaded to {file_path}"
             )
             progress.advance(task)
-        progress.console.print("✅ [bold green]Scryfall data updated!")
+        progress.console.print("[bold green]✓ Scryfall data updated!")
 
 
 if __name__ == "__main__":
