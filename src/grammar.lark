@@ -123,7 +123,7 @@ create: quantity "tapped"? power_toughness colors SUBTYPE+ TYPE+ /tokens?/ [with
       // | quantity colors SUBTYPE+ TYPE+ /tokens?/ "named" TOKEN_NAME "with \"" RULES_TEXT "\" and" KEYWORD "."
       
       
-sentence_following_create.3: "It has \"" RULES_TEXT "\""
+sentence_following_create: "It has \"" RULES_TEXT "\""
                            | "The token has" KEYWORD "and" KEYWORD "."
                            | "It has" KEYWORD "and \"" RULES_TEXT "\""
                            | "They each have" KEYWORD "and \"" RULES_TEXT "\""
