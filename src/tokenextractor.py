@@ -218,7 +218,7 @@ class TokenExtractor:
 
     def get_tokens_from_tree(self, tree):
         tokens = []
-        for sentence in tree.find_data("n_sentence"):
+        for sentence in tree.find_data("sentence"):
             characteristics = defaultdict(list)
 
             for child in sentence.children:
