@@ -60,9 +60,8 @@ def main(include_tokens: False) -> None:
                 try:
                     tokens = extractor.extract_from_card(card)
                 except Exception as err:
-                    # Okina, Temple to the Grandfathers = 33 characters
                     progress.console.print(
-                        f"Exception raised: [bold cyan]{card.name} [bold white]{token.name} [red]{err}"
+                        f"Exception: [bold cyan]{card.name} [red]{err}"
                     )
                 else:
                     for token in tokens:
