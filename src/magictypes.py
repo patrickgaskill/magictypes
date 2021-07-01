@@ -12,6 +12,7 @@ from mtgjsondata import MtgjsonData, legal_card_filter
 from stores import MaximalStore, Store, UniqueStore
 from tokenextractor import TokenExtractor
 from utils import make_output_dir
+from variations import variations
 
 
 def generate_output(stores: Iterable[Store], console: Console) -> None:
@@ -56,6 +57,11 @@ def main(include_tokens: False) -> None:
             for store in card_stores:
                 store.evaluate(card)
 
+            if card.name in variations:
+                for variation in variations[card.name](card):
+                    for store in card_stores:
+                        store.evaluate(variation)
+
             if include_tokens:
                 try:
                     tokens = extractor.extract_from_card(card)
@@ -67,14 +73,6 @@ def main(include_tokens: False) -> None:
                     for token in tokens:
                         for store in token_stores:
                             store.evaluate(token)
-
-            if card.name == "Grist, the Hunger Tide":
-                grist_copy = card.copy()
-                grist_copy.types.add("Creature")
-                grist_copy.subtypes.add("Insect")
-                grist_copy.clear_cached_properties()
-                for store in card_stores:
-                    store.evaluate(grist_copy)
 
             progress.advance(task)
 
