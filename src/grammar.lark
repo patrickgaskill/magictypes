@@ -5,7 +5,7 @@ paragraph: keyword_abilities reminder?
          | level_pt
          | reminder
 
-prefix: loyalty_cost | "•" | ("I"+ "—")
+prefix: loyalty_cost | "•" | ("I"+ "—") | INT ["-" INT] "|"
 loyalty_cost: /\[[+−]?(?:X|\d+)\]:/
 reminder: /\([^)]+\)/
 keyword_ability: WORD+ "—"? (WORD | SYMBOL)* (("or" | "and/or") SYMBOL+)?
@@ -27,7 +27,7 @@ sentence: text* /creates?/i create text* "."? sentence_following_create?
         | text+ ("—" | "." | /"/ sentence+ /"/ | /(?<!\w)'/ sentence+ /'/)?
 
 create: quantity "tapped"? power_toughness colors SUBTYPE+ TYPE+ /tokens?/ [with | named | with named | named with]
-      | legendary_name power_toughness colors SUBTYPE+ TYPE+ /tokens?/ with?
+      | legendary_name power_toughness? colors SUBTYPE+ TYPE+ /tokens?/ with?
       | quantity power_toughness TYPE+ /tokens?/
       | quantity power_toughness SUBTYPE+ TYPE+ /tokens?/ that_are_colors
       | quantity colors SUBTYPE+ TYPE+ /tokens?/ [named | with | named with]
@@ -69,7 +69,7 @@ that_are_colors: ("that are" | "that's") (ALL_COLORS | COLOR "," COLOR ", and" C
 SUBTYPE: CAP_WORD
 TYPE: "creature" | "artifact" | "enchantment" | "land" | "planeswalker"
 
-with: "with" (KEYWORD ["and" (KEYWORD | rules)] | rules ["and" KEYWORD] | "those characteristics")
+with: "with" (KEYWORD ["and" (KEYWORD | rules)] | rules ["," rules] ["and" KEYWORD] | "those characteristics")
 rules: /"/ RULES_TEXT /"/ | /(?<!\w)'/ INNER_RULES_TEXT /'/
 RULES_TEXT: /[^"]+/
 INNER_RULES_TEXT: /[^']+/

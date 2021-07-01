@@ -220,6 +220,7 @@ class TokenExtractor:
         tokens = []
         for sentence in tree.find_data("sentence"):
             characteristics = defaultdict(list)
+            rules = []
 
             for child in sentence.children:
                 if isinstance(child, Tree) and (
@@ -246,7 +247,9 @@ class TokenExtractor:
                         elif t.type == "RULES_TEXT" or t.type == "INNER_RULES_TEXT":
                             # Replace a trailing comma with a period and uppercase the first letter
                             text = regex.sub(r",$", r".", str(t))
-                            characteristics["text"] = text[0].upper() + text[1:]
+                            if text[-1] not in (".", '"', "'"):
+                                text += "."
+                            rules.append(text[0].upper() + text[1:])
                         elif t.type == "TOKEN_NAME" or t.type == "LEGENDARY_NAME":
                             characteristics["name"] = str(t)
                         elif t.type == "LEGENDARY":
@@ -255,6 +258,9 @@ class TokenExtractor:
                             characteristics["supertypes"].append(str("Snow"))
                         elif t.type == "PREDEFINED_TOKEN":
                             tokens.append(getattr(MagicToken, str(t)))
+
+            if rules:
+                characteristics["text"] = "\n".join(rules)
 
             if characteristics:
                 tokens.append(MagicToken(**characteristics))

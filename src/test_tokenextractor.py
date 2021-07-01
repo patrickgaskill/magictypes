@@ -3,6 +3,31 @@ import pytest
 from magicobjects import MagicToken
 
 test_cases = [
+    ("Treasure Chest", [MagicToken.Treasure]),
+    (
+        "Icingdeath, Frost Tyrant",
+        [
+            MagicToken(
+                name="Icingdeath, Frost Tongue",
+                colors=["W"],
+                supertypes=["Legendary"],
+                types=["Artifact"],
+                subtypes=["Equipment"],
+                text="Equipped creature gets +2/+0.\nWhenever equipped creature attacks, tap target creature defending player controls.",
+                keywords=["Equip {2}"],
+            )
+        ],
+    ),
+    (
+        "Tezzeret the Schemer",
+        [
+            MagicToken(
+                name="Etherium Cell",
+                types=["Artifact"],
+                text="{T}, Sacrifice this artifact: Add one mana of any color.",
+            )
+        ],
+    ),
     ("Carth the Lion", []),
     (
         "Ulvenwald Mysteries",
