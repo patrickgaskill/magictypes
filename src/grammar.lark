@@ -15,6 +15,7 @@ level_pt: power_toughness
 
 text.-1: "would create"
        | "Whenever you create"
+       | "Create Undead"
        | WORD
        | SYMBOL 
        | PT_MODIFIER 
@@ -36,10 +37,11 @@ create: quantity "tapped"? power_toughness colors SUBTYPE+ TYPE+ /tokens?/ [with
       | quantity PREDEFINED_TOKEN /tokens?/ "," quantity PREDEFINED_TOKEN /tokens?/ ", and" quantity PREDEFINED_TOKEN /tokens?/
       | quantity PREDEFINED_TOKEN /tokens?/ "or" quantity PREDEFINED_TOKEN /tokens?/
       | quantity PREDEFINED_TOKEN /tokens?/
-      | quantity "tapped"? /tokens?/ ("that's a copy" | "that are copies")
+      | quantity ["tapped" | "tapped and attacking"] /tokens?/ ("that's a copy" | "that are copies")
       | quantity "of those tokens"
       | "one of each"
       | "a copy"
+      | "those tokens"
       
 sentence_following_create: ("It has" | "They have" | "Those creatures have") rules
                          | ("It has" | "They each have") KEYWORD "and" rules

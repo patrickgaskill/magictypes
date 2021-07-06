@@ -3,6 +3,9 @@ import pytest
 from magicobjects import MagicToken
 
 test_cases = [
+    ("Delina, Wild Mage", []),
+    ("Sefris of the Hidden Ways", []),
+    ("Xorn", []),
     ("Treasure Chest", [MagicToken.Treasure]),
     (
         "Icingdeath, Frost Tyrant",

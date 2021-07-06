@@ -1,9 +1,21 @@
+def ageless_sentinels(card):
+    copy = card.copy()
+    new_subtypes = ["Bird", "Giant"]
+    copy.subtype_order = {s: i for i, s in enumerate(new_subtypes)}
+    copy.subtypes = set(new_subtypes)
+    copy.clear_cached_properties()
+    return [copy]
+
+
 def grist_the_hunger_tide(card):
-    grist_copy = card.copy()
-    grist_copy.types.add("Creature")
-    grist_copy.subtypes.add("Insect")
-    grist_copy.clear_cached_properties()
-    return [grist_copy]
+    copy = card.copy()
+    copy.types.add("Creature")
+    copy.subtypes.add("Insect")
+    copy.clear_cached_properties()
+    return [copy]
 
 
-variations = {"Grist, the Hunger Tide": grist_the_hunger_tide}
+variations = {
+    # "Ageless Sentinels": ageless_sentinels,
+    "Grist, the Hunger Tide": grist_the_hunger_tide,
+}

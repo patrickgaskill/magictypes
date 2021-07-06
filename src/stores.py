@@ -24,6 +24,23 @@ class Store:
         csv_path = output_path / (self.name.replace(" ", "_") + ".csv")
         with csv_path.open("w") as csvfile:
             writer = csv.writer(csvfile)
+
+            if any(obj.is_token for obj in self.store.values()):
+                writer.writerow(
+                    [
+                        "Types",
+                        "Token Name",
+                        "Card Name",
+                        "Set Code",
+                        "Number",
+                        "Release Date",
+                    ]
+                )
+            else:
+                writer.writerow(
+                    ["Types", "Card Name", "Set Code", "Number", "Release Date"]
+                )
+
             rows = [
                 (
                     obj.type_str,

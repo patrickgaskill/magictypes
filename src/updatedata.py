@@ -66,4 +66,4 @@ def fetch_scryfall() -> None:
 
 if __name__ == "__main__":
     fetch_mtgjson()
-    fetch_scryfall()
+    # fetch_scryfall()

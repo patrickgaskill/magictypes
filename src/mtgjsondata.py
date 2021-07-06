@@ -1,12 +1,12 @@
 from functools import cached_property
-from typing import Callable, Generator, Literal, Optional
+from typing import Callable, Generator, Optional
 
 from magicobjects import MagicCard, MagicObject, Subtype
 from utils import get_data_json
 
 
 def legal_card_filter(obj: dict[str, any], sets: dict[str, any]) -> bool:
-    if {"Card", "Dungeon"} & set(obj["types"]):
+    if "Card" in obj["types"]:
         return False
 
     if obj["borderColor"] in ("gold", "silver"):
