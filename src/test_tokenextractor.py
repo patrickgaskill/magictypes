@@ -1,6 +1,7 @@
 import pytest
 
 from magicobjects import MagicToken
+from token_test_cases.MID import MID_test_cases
 
 test_cases = [
     ("Delina, Wild Mage", []),
@@ -1510,6 +1511,8 @@ test_cases = [
     ("Ragavan, Nimble Pilferer", [MagicToken.Treasure]),
     ("Caravan Escort", []),
 ]
+
+test_cases += MID_test_cases
 
 
 @pytest.mark.parametrize("name,expected", test_cases)

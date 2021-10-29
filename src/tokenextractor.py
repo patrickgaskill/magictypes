@@ -40,6 +40,11 @@ class TokenExtractor:
         "Ulvenwald Mysteries",
         "Wavesifter",
         "Weirding Wood",
+        "Briarbridge Tracker",
+        "Dennick, Pious Apprentice // Dennick, Pious Apparition",
+        "Fateful Absence",
+        "Foul Play",
+        "Secrets of the Key",
     )
 
     overrides = {

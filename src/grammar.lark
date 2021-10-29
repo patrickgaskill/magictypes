@@ -48,7 +48,7 @@ sentence_following_create: ("It has" | "They have" | "Those creatures have") rul
                          | "The token has" KEYWORD "and" KEYWORD "."
                          | "It has" KEYWORD "," rules "and" KEYWORD "."
 
-quantity: WORD | "that many" | "a number of" | "twice X"
+quantity: WORD | "that many" | "a number of" | "twice X" | WORD "that many"
 
 LEGENDARY_NAME: /[A-Z][\w\s,]+(?=, a legendary)/
 legendary_name: LEGENDARY_NAME ", a" LEGENDARY
@@ -71,7 +71,11 @@ that_are_colors: ("that are" | "that's") (ALL_COLORS | COLOR "," COLOR ", and" C
 SUBTYPE: CAP_WORD
 TYPE: "creature" | "artifact" | "enchantment" | "land" | "planeswalker"
 
-with: "with" (KEYWORD ["and" (KEYWORD | rules)] | rules ["," rules] ["and" KEYWORD] | "those characteristics")
+with: "with" _with_text
+_with_text: KEYWORD ["," KEYWORD] [","? "and" (KEYWORD | rules)] 
+          | rules rules? ["and" KEYWORD] 
+          | "those characteristics"
+
 rules: /"/ RULES_TEXT /"/ | /(?<!\w)'/ INNER_RULES_TEXT /'/
 RULES_TEXT: /[^"]+/
 INNER_RULES_TEXT: /[^']+/
@@ -99,6 +103,7 @@ KEYWORD: "protection from " COLOR
        | "forestwalk"
        | "vigilance"
        | "changeling"
+       | "decayed"
 CAP_WORD: /[A-Z][\w\-']+/
 WORD: /(?!create\b)[\w\-']+/i
 
