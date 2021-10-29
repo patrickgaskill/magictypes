@@ -5,7 +5,7 @@ paragraph: keyword_abilities reminder?
          | level_pt
          | reminder
 
-prefix: loyalty_cost | "•" | ("I"+ "—") | INT ["-" INT] "|"
+prefix: loyalty_cost | "•" | ("I"+ "—") | INT ["—" INT | "+"] "|"
 loyalty_cost: /\[[+−]?(?:X|\d+)\]:/
 reminder: /\([^)]+\)/
 keyword_ability: WORD+ "—"? (WORD | SYMBOL)* (("or" | "and/or") SYMBOL+)?
