@@ -80,7 +80,7 @@ rules: /"/ RULES_TEXT /"/ | /(?<!\w)'/ INNER_RULES_TEXT /'/
 RULES_TEXT: /[^"]+/
 INNER_RULES_TEXT: /[^']+/
 
-PREDEFINED_TOKEN: "Food" | "Clue" | "Treasure" | "Shard" | "Gold" | "Walker"
+PREDEFINED_TOKEN: "Food" | "Clue" | "Treasure" | "Shard" | "Gold" | "Walker" | "Blood"
 
 SYMBOL: "{CHAOS}" | /\[[+-]\d+\]/ | /{[WUBRGCSXTEPQ]}/ | /{\d+}/ | /{[WUBRG2]\/[WUBRGP]}/
 PT_MODIFIER: /[+-]\w+\/[+-]\w+/

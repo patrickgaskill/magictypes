@@ -342,3 +342,12 @@ class MagicToken(MagicObject):
             power="2",
             toughness="2",
         )
+
+    @classmethod
+    @property
+    def Blood(cls):
+        return cls(
+            types=["Artifact"],
+            subtypes=["Blood"],
+            text="{1}, {T}, Discard a card, Sacrifice this artifact: Draw a card.",
+        )
