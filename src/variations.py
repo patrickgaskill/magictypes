@@ -15,7 +15,10 @@ def grist_the_hunger_tide(card):
     return [copy]
 
 
-variations = {
-    # "Ageless Sentinels": ageless_sentinels,
+global_variations = {
     "Grist, the Hunger Tide": grist_the_hunger_tide,
+}
+
+activated_variations = {
+    "Ageless Sentinels": ageless_sentinels,
 }
