@@ -145,6 +145,29 @@ class TokenExtractor:
                 "text": "When this creature enters the battlefield, it deals 1 damage to any target.",
             },
         ],
+        "Somberwald Beastmaster": [
+            {
+                "colors": ["G"],
+                "types": ["Creature"],
+                "subtypes": ["Wolf"],
+                "power": "2",
+                "toughness": "2",
+            },
+            {
+                "colors": ["G"],
+                "types": ["Creature"],
+                "subtypes": ["Beast"],
+                "power": "3",
+                "toughness": "3",
+            },
+            {
+                "colors": ["G"],
+                "types": ["Creature"],
+                "subtypes": ["Beast"],
+                "power": "4",
+                "toughness": "4",
+            },
+        ],
     }
 
     color_map: dict[str, str] = {

@@ -33,7 +33,7 @@ create: quantity "tapped"? power_toughness colors SUBTYPE+ TYPE+ /tokens?/ [with
       | quantity power_toughness SUBTYPE+ TYPE+ /tokens?/ that_are_colors
       | quantity colors SUBTYPE+ TYPE+ /tokens?/ [named | with | named with]
       | quantity colors TYPE+ /tokens?/ named? with
-      | quantity colors SNOW TYPE+ /tokens?/ named with      
+      | quantity colors SNOW TYPE+ /tokens?/ named with
       | quantity PREDEFINED_TOKEN /tokens?/ "," quantity PREDEFINED_TOKEN /tokens?/ ", and" quantity PREDEFINED_TOKEN /tokens?/
       | quantity PREDEFINED_TOKEN /tokens?/ "or" quantity PREDEFINED_TOKEN /tokens?/
       | quantity PREDEFINED_TOKEN /tokens?/
