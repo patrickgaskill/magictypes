@@ -104,6 +104,7 @@ KEYWORD: "protection from " COLOR
        | "vigilance"
        | "changeling"
        | "decayed"
+       | "training"
 CAP_WORD: /[A-Z][\w\-']+/
 WORD: /(?!create\b)[\w\-']+/i
 

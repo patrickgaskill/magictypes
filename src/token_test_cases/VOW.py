@@ -47,4 +47,71 @@ VOW_test_cases = [
             )
         ],
     ),
+    (
+        "Cemetery Protector",
+        [
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Human"],
+                power="1",
+                toughness="1",
+            )
+        ],
+    ),
+    (
+        "Krothuss, Lord of the Deep",
+        [],
+    ),
+    (
+        "Geralf, Visionary Stitcher",
+        [
+            MagicToken(
+                colors=["U"],
+                types=["Creature"],
+                subtypes=["Zombie"],
+                power="X",
+                toughness="X",
+            )
+        ],
+    ),
+    (
+        "Hallowed Haunting",
+        [
+            MagicToken(
+                colors=["W"],
+                types=["Creature"],
+                subtypes=["Spirit", "Cleric"],
+                text=[
+                    "This creature's power and toughness are each equal to the number of Spirits you control."
+                ],
+            )
+        ],
+    ),
+    (
+        "Manaform Hellkite",
+        [
+            MagicToken(
+                colors=["R"],
+                types=["Creature"],
+                subtypes=["Dragon", "Illusion"],
+                power="X",
+                toughness="X",
+                keywords=["Flying", "Haste"],
+            )
+        ],
+    ),
+    (
+        "Torens, Fist of the Angels",
+        [
+            MagicToken(
+                colors=["W", "G"],
+                types=["Creature"],
+                subtypes=["Human", "Soldier"],
+                power="1",
+                toughness="1",
+                keywords=["Training"],
+            )
+        ],
+    ),
 ]
