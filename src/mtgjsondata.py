@@ -91,17 +91,28 @@ class MtgjsonData:
         objects = self.all_identifiers.values()
 
         for obj in objects:
+            # if obj["name"] == "Dungeon of the Mad Mage":
+            #     print(obj)
+
             if callable(filterfunc) and not filterfunc(obj, sets):
                 continue
 
             set_code = None
             set_release_date = None
             set_type = None
-            if "setCode" in obj and obj["setCode"] in sets:
+
+            if "setCode" in obj:
                 set_code = obj["setCode"]
-                s = sets[set_code]
-                set_release_date = s["releaseDate"]
-                set_type = s["type"]
+                if set_code in sets:
+                    s = sets[set_code]
+                    set_release_date = s["releaseDate"]
+                    set_type = s["type"]
+                elif len(set_code) == 4:  # Handle token sets like TAFR
+                    trimmed_set_code = set_code[-3:]
+                    if trimmed_set_code in sets:
+                        s = sets[trimmed_set_code]
+                        set_release_date = s["releaseDate"]
+                        set_type = s["type"]
 
             magic_card = MagicCard(
                 name=obj["name"],
