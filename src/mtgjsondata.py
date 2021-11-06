@@ -91,9 +91,6 @@ class MtgjsonData:
         objects = self.all_identifiers.values()
 
         for obj in objects:
-            # if obj["name"] == "Dungeon of the Mad Mage":
-            #     print(obj)
-
             if callable(filterfunc) and not filterfunc(obj, sets):
                 continue
 
