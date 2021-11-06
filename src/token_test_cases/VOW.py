@@ -32,7 +32,7 @@ VOW_test_cases = [
             )
         ],
     ),
-    ("Vampire's Vengeance", [MagicToken.Blood]),
+    ("Vampires' Vengeance", [MagicToken.Blood]),
     ("Voldaren Bloodcaster", [MagicToken.Blood]),
     ("Voldaren Estate", [MagicToken.Blood]),
     (
@@ -82,9 +82,7 @@ VOW_test_cases = [
                 colors=["W"],
                 types=["Creature"],
                 subtypes=["Spirit", "Cleric"],
-                text=[
-                    "This creature's power and toughness are each equal to the number of Spirits you control."
-                ],
+                text="This creature's power and toughness are each equal to the number of Spirits you control.",
             )
         ],
     ),
@@ -114,4 +112,5 @@ VOW_test_cases = [
             )
         ],
     ),
+    ("Path of Peril", []),
 ]

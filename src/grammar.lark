@@ -14,13 +14,14 @@ level: "LEVEL" ((INT "-" INT) | (INT "+"))
 level_pt: power_toughness
 
 text.-1: "would create"
+       | "Whenever you create a" PREDEFINED_TOKEN "token"
        | "Whenever you create"
        | "Create Undead"
        | WORD
        | SYMBOL 
        | PT_MODIFIER 
        | reminder 
-       | /[\/:,!]/ 
+       | /[\/:,!+\[\]]/ 
        | /"/ text+ /"/ 
        | /(?<!\w)'/ text+ /'/
 

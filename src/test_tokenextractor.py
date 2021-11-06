@@ -1516,7 +1516,7 @@ test_cases = [
 
 test_cases += MID_test_cases
 test_cases += MIC_test_cases
-# test_cases += VOW_test_cases
+test_cases += VOW_test_cases
 
 
 @pytest.mark.parametrize("name,expected", test_cases)
