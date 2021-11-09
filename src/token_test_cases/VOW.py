@@ -41,7 +41,7 @@ VOW_test_cases = [
         ],
     ),
     (
-        "Nuturing Presence",
+        "Nurturing Presence",
         [
             MagicToken(
                 colors=["W"],
@@ -199,7 +199,7 @@ VOW_test_cases = [
         ],
     ),
     ("Olivia's Attendants", [MagicToken.Blood]),
-    ("Sanguine Statue", [MagicToken.Blood]),
+    ("Sanguine Statuette", [MagicToken.Blood]),
     (
         "Stensia Uprising",
         [
