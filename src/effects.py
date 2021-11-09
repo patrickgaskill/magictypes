@@ -55,6 +55,14 @@ def after_effects(card: MagicObject) -> list[MagicObject]:
         if affected_card.is_permanent:
             affected_card.supertypes.add("Snow")
 
+        # Arterial Alchemy (Blood tokens are Equipment)
+        if affected_card.is_token and "Blood" in affected_card.subtypes:
+            affected_card.subtypes.add("Equipment")
+            affected_card.text = " ".join(
+                [affected_card.text, "Equipped creature gets +2/+0."]
+            )
+            affected_card.keywords.append("Equip {2}")
+
         affected_card.clear_cached_properties()
 
     return returned_cards

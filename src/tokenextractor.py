@@ -45,6 +45,8 @@ class TokenExtractor:
         "Fateful Absence",
         "Foul Play",
         "Secrets of the Key",
+        "Ethereal Investigator",
+        "Disorder in the Court",
     )
 
     overrides = {
