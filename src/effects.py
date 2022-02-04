@@ -1,4 +1,4 @@
-from magicobjects import MagicObject
+from magicobjects import MagicObject, MagicToken
 
 
 def after_effects(card: MagicObject) -> list[MagicObject]:
@@ -61,7 +61,7 @@ def after_effects(card: MagicObject) -> list[MagicObject]:
             affected_card.text = " ".join(
                 [affected_card.text, "Equipped creature gets +2/+0."]
             )
-            affected_card.keywords.append("Equip {2}")
+            affected_card.keywords.add("Equip {2}")
 
         affected_card.clear_cached_properties()
 
