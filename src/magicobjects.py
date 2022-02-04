@@ -215,6 +215,7 @@ class MagicCard(MagicObject):
     def copy(self) -> "MagicCard":
         return MagicCard(
             name=self.name,
+            colors=self.colors.copy(),
             types=self.types.copy(),
             subtypes=self.sorted_subtypes,
             supertypes=self.supertypes.copy(),
@@ -228,6 +229,22 @@ class MagicCard(MagicObject):
             availability=self.availability.copy(),
             layout=self.layout,
             text=self.text,
+            power=self.power,
+            toughness=self.toughness,
+        )
+
+    def copy_as_token(self) -> "MagicToken":
+        return MagicToken(
+            name=self.name,
+            colors=self.colors.copy(),
+            types=self.types.copy(),
+            subtypes=self.sorted_subtypes,
+            supertypes=self.supertypes.copy(),
+            keywords=self.keywords.copy(),
+            text=self.text,
+            power=self.power,
+            toughness=self.toughness,
+            creator=self.copy(),
         )
 
 
