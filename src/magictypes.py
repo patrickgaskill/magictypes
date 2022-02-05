@@ -103,21 +103,24 @@ def main(
 
             cached_sort_keys[card.name] = card.sort_key
 
-            for store in card_stores:
-                store.evaluate(card)
+            cards_to_evaluate = (
+                [card] + global_variations[card.name](card)
+                if card.name in global_variations
+                else [card]
+            )
 
-            # apply_effects could return cards and tokens
-            for affected_obj in apply_effects(card):
-                if affected_obj.object_type == "token" and include_tokens:
-                    maximal_affected_token_store.evaluate(affected_obj)
+            for c in cards_to_evaluate:
+                for store in card_stores:
+                    store.evaluate(c)
 
-                if affected_obj.object_type == "card":
-                    maximal_affected_card_store.evaluate(affected_obj)
+                for affected_obj in apply_effects(c):
+                    # apply_effects could return cards and tokens
 
-            # if card.name in global_variations:
-            #     for variation in global_variations[card.name](card):
-            #         for store in card_stores:
-            #             store.evaluate(variation)
+                    if affected_obj.object_type == "token" and include_tokens:
+                        maximal_affected_token_store.evaluate(affected_obj)
+
+                    if affected_obj.object_type == "card":
+                        maximal_affected_card_store.evaluate(affected_obj)
 
             if include_tokens:
                 try:
