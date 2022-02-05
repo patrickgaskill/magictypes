@@ -21,7 +21,7 @@ text.-1: "would create"
        | SYMBOL 
        | PT_MODIFIER 
        | reminder 
-       | /[\/:,!+\[\]]/ 
+       | /[\/:;,!+\[\]]/ 
        | /"/ text+ /"/ 
        | /(?<!\w)'/ text+ /'/
 
@@ -29,7 +29,8 @@ sentence: text* /creates?/i create text* "."? sentence_following_create?
         | text+ ("—" | "." | /"/ sentence+ /"/ | /(?<!\w)'/ sentence+ /'/)?
 
 create: quantity "tapped"? power_toughness colors SUBTYPE+ TYPE+ /tokens?/ [with | named | with named | named with]
-      | legendary_name power_toughness? colors SUBTYPE+ TYPE+ /tokens?/ with?
+      | legendary_name power_toughness? colors SUBTYPE* TYPE+ /tokens?/ with?
+      | legendary_name power_toughness? colors* SUBTYPE* TYPE+ /tokens?/ with? that_are_colors
       | quantity power_toughness TYPE+ /tokens?/
       | quantity power_toughness SUBTYPE+ TYPE+ /tokens?/ that_are_colors
       | quantity colors SUBTYPE+ TYPE+ /tokens?/ [named | with | named with]
@@ -51,7 +52,7 @@ sentence_following_create: ("It has" | "They have" | "Those creatures have") rul
 
 quantity: WORD | "that many" | "a number of" | "twice X" | WORD "that many"
 
-LEGENDARY_NAME: /[A-Z][\w\s,]+(?=, a legendary)/
+LEGENDARY_NAME: /[A-Z][\w\s,']+(?=, a legendary)/
 legendary_name: LEGENDARY_NAME ", a" LEGENDARY
 
 TOKEN_NAME: CAP_WORD ((" " WORD)* " " CAP_WORD)*
@@ -73,8 +74,9 @@ SUBTYPE: CAP_WORD
 TYPE: "creature" | "artifact" | "enchantment" | "land" | "planeswalker"
 
 with: "with" _with_text
-_with_text: KEYWORD ["," KEYWORD] [","? "and" (KEYWORD | rules)] 
+_with_text: KEYWORD ("," KEYWORD)* [","? "and" (KEYWORD | rules)] 
           | rules rules? ["and" KEYWORD] 
+          | rules "and" rules
           | "those characteristics"
 
 rules: /"/ RULES_TEXT /"/ | /(?<!\w)'/ INNER_RULES_TEXT /'/

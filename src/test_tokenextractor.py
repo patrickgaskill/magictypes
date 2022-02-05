@@ -3,6 +3,7 @@ import pytest
 from magicobjects import MagicToken
 from token_test_cases.MIC import MIC_test_cases
 from token_test_cases.MID import MID_test_cases
+from token_test_cases.NEO import NEO_test_cases
 from token_test_cases.VOW import VOW_test_cases
 
 test_cases = [
@@ -1517,6 +1518,7 @@ test_cases = [
 test_cases += MID_test_cases
 test_cases += MIC_test_cases
 test_cases += VOW_test_cases
+test_cases += NEO_test_cases
 
 
 @pytest.mark.parametrize("name,expected", test_cases)
