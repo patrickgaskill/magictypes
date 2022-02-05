@@ -1,20 +1,19 @@
 import csv
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, Optional, Tuple
 
 from magicobjects import MagicObject, TypeKey
 
 
 class Store:
-    def __init__(self, name: str, effects: Optional[Callable] = None):
+    def __init__(self, name: str):
         self.store: dict[TypeKey, MagicObject] = {}
         self.name = name
-        self.effects = effects
 
-    def evaluate(self, obj: MagicObject, apply_effects: bool = True) -> bool:
-        if apply_effects and callable(self.effects):
-            for affected_card in self.effects(obj):
-                self.evaluate(affected_card, False)
+    def evaluate(self, obj: MagicObject) -> bool:
+        # if apply_effects and callable(self.effects):
+        #     for affected_card in self.effects(obj):
+        #         self.evaluate(affected_card, False)
 
         self.store[obj.type_key] = True
 
@@ -75,10 +74,10 @@ class Store:
 
 
 class UniqueStore(Store):
-    def evaluate(self, obj: MagicObject, apply_effects: bool = True) -> bool:
-        if apply_effects and callable(self.effects):
-            for affected_card in self.effects(obj):
-                self.evaluate(affected_card, False)
+    def evaluate(self, obj: MagicObject) -> bool:
+        # if apply_effects and callable(self.effects):
+        #     for affected_card in self.effects(obj):
+        #         self.evaluate(affected_card, False)
 
         if (
             obj.type_key not in self.store
@@ -91,14 +90,14 @@ class UniqueStore(Store):
 
 
 class MaximalStore(Store):
-    def __init__(self, name: str, effects: Optional[Callable] = None):
-        super().__init__(name, effects)
+    def __init__(self, name: str):
+        super().__init__(name)
         self.eliminated_keys: dict[TypeKey, MagicObject] = {}
 
-    def evaluate(self, obj: MagicObject, apply_effects: bool = True) -> bool:
-        if apply_effects and callable(self.effects):
-            for affected_card in self.effects(obj):
-                self.evaluate(affected_card, False)
+    def evaluate(self, obj: MagicObject) -> bool:
+        # if apply_effects and callable(self.effects):
+        #     for affected_card in self.effects(obj):
+        #         self.evaluate(affected_card, False)
 
         if obj.type_key in self.eliminated_keys:
             return False
@@ -126,3 +125,82 @@ class MaximalStore(Store):
 
         self.store[obj.type_key] = obj
         return True
+
+
+class UniquePowerToughnessStore(Store):
+    def __init__(self, name: str):
+        super().__init__(name)
+        self.store: dict[Tuple[int, int], MagicObject] = {}
+
+    def evaluate(self, obj: MagicObject) -> bool:
+        if (
+            obj.power is None
+            or not obj.power.isdigit()
+            or obj.toughness is None
+            or not obj.toughness.isdigit()
+        ):
+            return False
+
+        key = (int(obj.power), int(obj.toughness))
+
+        if key in self.store:
+            if obj.sort_key < self.store[key].sort_key:
+                self.store[key] = obj
+                return True
+            return False
+
+        self.store[key] = obj
+        return True
+
+    def write_csv(self, output_path: Path) -> str:
+        csv_path = output_path / (self.name.replace(" ", "_") + ".csv")
+        with csv_path.open("w") as csvfile:
+            writer = csv.writer(csvfile)
+
+            if any(obj.is_token for obj in self.store.values()):
+                writer.writerow(
+                    [
+                        "Power",
+                        "Toughness",
+                        "Token Name",
+                        "Card Name",
+                        "Set Code",
+                        "Number",
+                        "Release Date",
+                    ]
+                )
+            else:
+                writer.writerow(
+                    [
+                        "Power",
+                        "Toughness",
+                        "Card Name",
+                        "Set Code",
+                        "Number",
+                        "Release Date",
+                    ]
+                )
+
+            rows = [
+                (
+                    obj.power,
+                    obj.toughness,
+                    obj.name,
+                    obj.creator.name,
+                    obj.creator.set_code,
+                    obj.creator.number,
+                    obj.creator.release_date,
+                )
+                if obj.is_token
+                else (
+                    obj.power,
+                    obj.toughness,
+                    obj.name,
+                    obj.set_code,
+                    obj.number,
+                    obj.release_date,
+                )
+                for obj in sorted(self.store.values(), key=lambda obj: obj.sort_key)
+            ]
+            writer.writerows(rows)
+        return csv_path

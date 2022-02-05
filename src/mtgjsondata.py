@@ -120,6 +120,8 @@ class MtgjsonData:
                 ),  # mtgjson adds a fake Token type to token objects
                 subtypes=obj["subtypes"],
                 supertypes=obj["supertypes"],
+                power=obj["power"] if "power" in obj else None,
+                toughness=obj["toughness"] if "toughness" in obj else None,
                 keywords=obj["keywords"] if "keywords" in obj else {},
                 set_code=set_code,
                 set_release_date=set_release_date,

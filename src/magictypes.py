@@ -7,9 +7,10 @@ from rich.console import Console
 from rich.progress import Progress
 from rich.table import Table
 
-from effects import after_effects
+from effects import apply_effects
+from magicobjects import SortKey
 from mtgjsondata import MtgjsonData, legal_card_filter
-from stores import MaximalStore, Store, UniqueStore
+from stores import MaximalStore, Store, UniquePowerToughnessStore, UniqueStore
 from tokenextractor import TokenExtractor
 from utils import make_output_dir
 from variations import activated_variations, global_variations
@@ -46,17 +47,43 @@ def main(
     console = Console()
     extractor = TokenExtractor()
 
+    # card_stores = [
+    #     UniqueStore("unique cards"),
+    #     MaximalStore("maximal cards"),
+    #     MaximalStore("maximal affected cards", after_effects),
+    # ]
+
+    # token_stores = [
+    #     UniqueStore("unique tokens"),
+    #     MaximalStore("maximal tokens"),
+    #     MaximalStore("maximal affected tokens", after_effects),
+    # ]
+
+    unique_card_store = UniqueStore("unique cards")
+    maximal_card_store = MaximalStore("maximal cards")
+    maximal_affected_card_store = MaximalStore("maximal affected cards")
+    unique_power_toughness_card_store = UniquePowerToughnessStore("unique PT cards")
+
     card_stores = [
-        UniqueStore("unique cards"),
-        MaximalStore("maximal cards"),
-        MaximalStore("maximal affected cards", after_effects),
+        unique_card_store,
+        maximal_card_store,
+        maximal_affected_card_store,
+        unique_power_toughness_card_store,
     ]
 
+    unique_token_store = UniqueStore("unique tokens")
+    maximal_token_store = MaximalStore("maximal tokens")
+    maximal_affected_token_store = MaximalStore("maximal affected tokens")
+    unique_power_toughness_token_store = UniquePowerToughnessStore("unique PT tokens")
+
     token_stores = [
-        UniqueStore("unique tokens"),
-        MaximalStore("maximal tokens"),
-        MaximalStore("maximal affected tokens", after_effects),
+        unique_token_store,
+        maximal_token_store,
+        maximal_affected_token_store,
+        unique_power_toughness_token_store,
     ]
+
+    cached_sort_keys: dict[str, SortKey] = {}
 
     with Progress(transient=True, console=console) as progress:
         task = progress.add_task("Processing cards...", start=False)
@@ -66,13 +93,31 @@ def main(
         progress.start_task(task)
 
         for card in cards:
+            # If we've already seen an older version of the same card, bail out
+            if (
+                card.name in cached_sort_keys
+                and card.sort_key > cached_sort_keys[card.name]
+            ):
+                progress.advance(task)
+                continue
+
+            cached_sort_keys[card.name] = card.sort_key
+
             for store in card_stores:
                 store.evaluate(card)
 
-            if card.name in global_variations:
-                for variation in global_variations[card.name](card):
-                    for store in card_stores:
-                        store.evaluate(variation)
+            # apply_effects could return cards and tokens
+            for affected_obj in apply_effects(card):
+                if affected_obj.object_type == "token" and include_tokens:
+                    maximal_affected_token_store.evaluate(affected_obj)
+
+                if affected_obj.object_type == "card":
+                    maximal_affected_card_store.evaluate(affected_obj)
+
+            # if card.name in global_variations:
+            #     for variation in global_variations[card.name](card):
+            #         for store in card_stores:
+            #             store.evaluate(variation)
 
             if include_tokens:
                 try:

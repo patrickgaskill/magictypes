@@ -11,6 +11,7 @@ Subtype = NewType("Subtype", str)
 Supertype = NewType("Supertype", str)
 Keyword = NewType("Keyword", str)
 TypeKey = tuple[tuple[Supertype, ...], tuple[CardType, ...], tuple[Subtype, ...]]
+SortKey = tuple[datetime, str, int, str]
 
 COLOR_ORDER: dict[Color, int] = {"W": 0, "U": 1, "B": 2, "R": 3, "G": 4}
 
@@ -154,7 +155,7 @@ class MagicObject:
         )
 
     @cached_property
-    def sort_key(self) -> tuple[datetime, str, int, str]:
+    def sort_key(self) -> SortKey:
         raise NotImplementedError("Generic Magic objects do not have a sort key.")
 
     def is_type_subset(self, other: "MagicObject") -> bool:
@@ -203,13 +204,18 @@ class MagicCard(MagicObject):
         return self.set_release_date
 
     @cached_property
-    def sort_key(self) -> tuple[datetime, str, int, str]:
+    def sort_key(self) -> SortKey:
         release_date = (
             datetime.fromisoformat(self.release_date)
             if self.release_date
             else datetime.max
         )
-        parsed_number = int(re.sub(r"[^\d]+", "", self.number))
+        try:
+            parsed_number = int(re.sub(r"[^\d]+", "", self.number))
+        except ValueError as err:
+            # Viscera Seer has number VS
+            parsed_number = 0
+
         return release_date, self.set_code, parsed_number, self.number
 
     def copy(self) -> "MagicCard":
@@ -267,7 +273,7 @@ class MagicToken(MagicObject):
         raise AttributeError("This instance of MagicToken does not have a creator set")
 
     @cached_property
-    def sort_key(self) -> tuple[datetime, str, int, str]:
+    def sort_key(self) -> SortKey:
         if self.creator:
             return self.creator.sort_key
 

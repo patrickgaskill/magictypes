@@ -1,7 +1,7 @@
-from magicobjects import MagicObject, MagicToken
+from magicobjects import MagicObject
 
 
-def after_effects(card: MagicObject) -> list[MagicObject]:
+def apply_effects(card: MagicObject) -> list[MagicObject]:
     returned_cards = [card.copy()]
 
     # Moritte of the Frost is a copy so doesn't see the following type-changing effects
@@ -19,6 +19,11 @@ def after_effects(card: MagicObject) -> list[MagicObject]:
         dermotaxi_copy.types.add("Artifact")
         dermotaxi_copy.subtypes.add("Vehicle")
         returned_cards.append(dermotaxi_copy)
+
+    # Replication Technique (copy permanent as token)
+    if card.is_permanent:
+        replication_technique_copy = card.copy_as_token()
+        returned_cards.append(replication_technique_copy)
 
     for affected_card in returned_cards:
         # Enchanted Evening (all permanents are enchantments)
