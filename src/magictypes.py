@@ -103,17 +103,31 @@ def main(
 
             cached_sort_keys[card.name] = card.sort_key
 
-            cards_to_evaluate = (
+            objects_to_evaluate = (
                 [card] + global_variations[card.name](card)
                 if card.name in global_variations
                 else [card]
             )
 
-            for c in cards_to_evaluate:
-                for store in card_stores:
-                    store.evaluate(c)
+            if include_tokens:
+                try:
+                    extracted_tokens = extractor.extract_from_card(card)
+                    objects_to_evaluate.extend(extracted_tokens)
+                except Exception as err:
+                    progress.console.print(
+                        f"Exception: [bold cyan]{card.name} [red]{err}"
+                    )
 
-                for affected_obj in apply_effects(c):
+            for obj in objects_to_evaluate:
+                if obj.object_type == "token" and include_tokens:
+                    for store in token_stores:
+                        store.evaluate(obj)
+
+                if obj.object_type == "card":
+                    for store in card_stores:
+                        store.evaluate(obj)
+
+                for affected_obj in apply_effects(obj):
                     # apply_effects could return cards and tokens
 
                     if affected_obj.object_type == "token" and include_tokens:
@@ -121,18 +135,6 @@ def main(
 
                     if affected_obj.object_type == "card":
                         maximal_affected_card_store.evaluate(affected_obj)
-
-            if include_tokens:
-                try:
-                    tokens = extractor.extract_from_card(card)
-                except Exception as err:
-                    progress.console.print(
-                        f"Exception: [bold cyan]{card.name} [red]{err}"
-                    )
-                else:
-                    for token in tokens:
-                        for store in token_stores:
-                            store.evaluate(token)
 
             progress.advance(task)
 

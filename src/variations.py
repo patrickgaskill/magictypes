@@ -16,7 +16,7 @@ def grist_the_hunger_tide(card):
 
 
 global_variations = {
-    "Grist, the Hunger Tide": grist_the_hunger_tide,
+    # "Grist, the Hunger Tide": grist_the_hunger_tide,
 }
 
 activated_variations = {
